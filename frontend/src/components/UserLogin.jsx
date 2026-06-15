@@ -30,7 +30,7 @@ return ( <div className="min-h-screen flex">
   </div>
 
   {/* Right Side */}
-  <div className="flex-1 flex items-center justify-center bg-[#050816] px-6">
+  <div className="flex-1 flex items-center justify-center bg-[#000000] px-6">
 
     <div className="w-full max-w-md">
 

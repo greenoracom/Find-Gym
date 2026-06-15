@@ -5,6 +5,8 @@ const superadminUserRoutes = require('./routes/superadminUserRoutes');
 const superadminAdminRoutes = require('./routes/superadminAdminRoutes');
 const superadminGymRoutes = require('./routes/superadminGymRoutes');
 const superadminCmsRoutes = require('./routes/superadminCmsRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const cityAdminRoutes = require('./routes/cityAdminRoutes');
 
 const app = express();
 
@@ -25,5 +27,7 @@ app.use('/api/superadmin/users', superadminUserRoutes);
 app.use('/api/superadmin/admins', superadminAdminRoutes);
 app.use('/api/superadmin/gyms', superadminGymRoutes);
 app.use('/api/superadmin/cms', superadminCmsRoutes);
+app.use('/api/admins', adminRoutes);
+app.use('/api/city-admin', cityAdminRoutes);
 
 module.exports = app;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import Table from '../common/Table';
 import Badge from '../common/Badge';
@@ -10,30 +10,73 @@ const AdminsList = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [adminToDelete, setAdminToDelete] = useState(null);
+  
+  const [admins, setAdmins] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const admins = [
-    { id: 'ADM-001', name: 'Vikram Singh', email: 'vikram@findgym.com', phone: '+91 9876543220', status: 'Active', created: '2023-11-01', permissions: 10 },
-    { id: 'ADM-002', name: 'Neha Gupta', email: 'neha@findgym.com', phone: '+91 9876543221', status: 'Active', created: '2023-12-15', permissions: 7 },
-    { id: 'ADM-003', name: 'Rohan Desai', email: 'rohan@findgym.com', phone: '+91 9876543222', status: 'Inactive', created: '2024-01-10', permissions: 5 },
-  ];
+  const fetchAdmins = async () => {
+    try {
+      setLoading(true);
+      const baseUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
+      const response = await fetch(`${baseUrl}/api/admins/all`);
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setAdmins(data.admins);
+      } else {
+        console.error('Failed to fetch admins:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching admins:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
 
   const handleDelete = (admin) => {
     setAdminToDelete(admin);
     setShowDelete(true);
   };
 
-  const confirmDelete = () => {
-    // API call
+  const confirmDelete = async () => {
+    if (!adminToDelete) return;
+    
+    try {
+      const baseUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
+      const response = await fetch(`${baseUrl}/api/admins/${adminToDelete._id}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Remove from list
+        setAdmins(prev => prev.filter(a => a._id !== adminToDelete._id));
+      } else {
+        alert(data.message || 'Failed to delete admin');
+      }
+    } catch (error) {
+      console.error('Error deleting admin:', error);
+      alert('Network error occurred');
+    }
+    
     setShowDelete(false);
+    setAdminToDelete(null);
   };
 
   const columns = [
-    { title: 'Admin ID', key: 'id' },
+    { 
+      title: 'Admin ID', 
+      key: 'id',
+      render: (row) => <span className="text-gray-500 text-xs">{row._id?.substring(0, 8)}...</span>
+    },
     { 
       title: 'Name', 
-      key: 'name',
+      key: 'fullName',
       render: (row) => (
-        <div className="font-medium text-gray-900">{row.name}</div>
+        <div className="font-medium text-gray-900">{row.fullName}</div>
       )
     },
     { title: 'Email', key: 'email' },
@@ -46,9 +89,9 @@ const AdminsList = () => {
       )
     },
     { 
-      title: 'Permissions', 
-      key: 'permissions',
-      render: (row) => <span className="text-gray-500">{row.permissions} permissions</span>
+      title: 'Role', 
+      key: 'adminType',
+      render: (row) => <span className="text-gray-500">{row.adminType}</span>
     },
     { 
       title: 'Actions', 
@@ -75,11 +118,21 @@ const AdminsList = () => {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <Table data={admins} columns={columns} />
+        {loading ? (
+          <div className="p-8 text-center text-gray-500">Loading admins...</div>
+        ) : admins.length > 0 ? (
+          <Table data={admins} columns={columns} />
+        ) : (
+          <div className="p-8 text-center text-gray-500">No admins found. Create one to get started.</div>
+        )}
       </div>
 
       {showCreate && (
-        <CreateAdmin isOpen={showCreate} onClose={() => setShowCreate(false)} />
+        <CreateAdmin 
+          isOpen={showCreate} 
+          onClose={() => setShowCreate(false)} 
+          onSuccess={fetchAdmins} // Refresh list after creation
+        />
       )}
 
       <ConfirmationModal
@@ -87,7 +140,7 @@ const AdminsList = () => {
         onClose={() => setShowDelete(false)}
         onConfirm={confirmDelete}
         title="Delete Admin"
-        message={`Are you sure you want to delete ${adminToDelete?.name}? This action cannot be undone.`}
+        message={`Are you sure you want to delete ${adminToDelete?.fullName}? This action cannot be undone.`}
         dangerMode={true}
       />
     </div>

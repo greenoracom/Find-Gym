@@ -12,12 +12,39 @@ import TrainersList from './admins/components/Trainers/TrainersList';
 import DietitiansList from './admins/components/Dietitians/DietitiansList';
 import Payments from './admins/components/Payments/Payments';
 import CMSManagement from './admins/components/CMS/CMSManagement';
+import SetupPassword from './admins/pages/SetupPassword';
+import Login from './admins/pages/Login';
+
+// Platform Admin Imports
+import PlatformAdminDashboard from './pages/PlatformAdminDashboard';
+import PADashboard from './admins/components/PlatformAdmin/Dashboard/Dashboard';
+import PAUsersList from './admins/components/PlatformAdmin/Users/UsersList';
+import PAGymsList from './admins/components/PlatformAdmin/Gyms/GymsList';
+import PATrainersList from './admins/components/PlatformAdmin/Trainers/TrainersList';
+import PATransactionHistory from './admins/components/PlatformAdmin/Payments/TransactionHistory';
+import PARevenueReports from './admins/components/PlatformAdmin/Payments/RevenueReports';
+import PAPayoutManagement from './admins/components/PlatformAdmin/Payments/PayoutManagement';
+import PAGymCategories from './admins/components/PlatformAdmin/CMS/GymCategories';
+
+// City Admin Imports
+import CityAdminDashboard from './pages/CityAdminDashboard';
+import CADashboard from './admins/components/CityAdminDashboard/Dashboard/Dashboard';
+import CAUsersList from './admins/components/CityAdminDashboard/Users/UsersList';
+import CAGymsList from './admins/components/CityAdminDashboard/Gyms/GymsList';
+import CATrainersList from './admins/components/CityAdminDashboard/Trainers/TrainersList';
+import CADietitiansList from './admins/components/CityAdminDashboard/Dietitians/DietitiansList';
+import CAAnalytics from './admins/components/CityAdminDashboard/Analytics/Analytics';
+import CAActivityLogs from './admins/components/CityAdminDashboard/ActivityLogs/ActivityLogs';
+import CASettings from './admins/components/CityAdminDashboard/Settings/Settings';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/super-admin" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+        <Route path="/admin/setup-password" element={<SetupPassword />} />
         
         <Route path="/super-admin" element={<SuperAdminLayout />}>
           <Route index element={<Dashboard />} />
@@ -30,6 +57,35 @@ function App() {
           <Route path="dietitians" element={<DietitiansList />} />
           <Route path="payments" element={<Payments />} />
           <Route path="cms" element={<CMSManagement />} />
+        </Route>
+
+        <Route path="/platform-admin" element={<PlatformAdminDashboard />}>
+          <Route path="dashboard" element={<PADashboard />} />
+          <Route path="users" element={<PAUsersList />} />
+          <Route path="gyms" element={<PAGymsList />} />
+          <Route path="trainers" element={<PATrainersList />} />
+          <Route path="payments">
+            <Route index element={<PATransactionHistory />} />
+            <Route path="history" element={<PATransactionHistory />} />
+            <Route path="revenue" element={<PARevenueReports />} />
+            <Route path="payouts" element={<PAPayoutManagement />} />
+          </Route>
+          {/* Using CMS component from super admin temporarily if not specified, otherwise map to correct CMS */}
+          <Route path="cms">
+            <Route index element={<CMSManagement />} />
+            <Route path="gym-categories" element={<PAGymCategories />} />
+          </Route>
+        </Route>
+
+        <Route path="/city-admin" element={<CityAdminDashboard />}>
+          <Route path="dashboard" element={<CADashboard />} />
+          <Route path="users" element={<CAUsersList />} />
+          <Route path="gyms" element={<CAGymsList />} />
+          <Route path="trainers" element={<CATrainersList />} />
+          <Route path="dietitians" element={<CADietitiansList />} />
+          <Route path="analytics" element={<CAAnalytics />} />
+          <Route path="activity-logs" element={<CAActivityLogs />} />
+          <Route path="settings" element={<CASettings />} />
         </Route>
       </Routes>
     </BrowserRouter>

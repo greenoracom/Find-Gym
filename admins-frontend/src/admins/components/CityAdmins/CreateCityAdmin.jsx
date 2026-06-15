@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import Modal from '../common/Modal';
 import Button from '../common/Button';
 import FormInput from '../common/FormInput';
@@ -34,9 +35,33 @@ const CreateCityAdmin = ({ isOpen, onClose }) => {
     setFormData(prev => ({ ...prev, assignedCities: cities }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onClose();
+    try {
+      const baseUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
+      const token = localStorage.getItem('superAdminToken');
+      await axios.post(
+        `${baseUrl}/api/admins/create`,
+        {
+          fullName: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          adminType: 'city_admin',
+          status: formData.status,
+          assignedCities: formData.assignedCities,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      alert('City Admin created successfully! Setup email has been sent.');
+      onClose();
+      if (window.location.reload) window.location.reload();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to create City Admin');
+    }
   };
 
   return (

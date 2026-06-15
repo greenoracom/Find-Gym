@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const UserRegister = () => {
   const [step, setStep] = useState(1);
@@ -34,7 +35,6 @@ const UserRegister = () => {
       ...formData,
       [name]: type === 'checkbox' ? checked : value
     });
-    // Clear error for the field being edited
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -127,22 +127,22 @@ const UserRegister = () => {
     e.preventDefault();
     if (validateStep()) {
       console.log('Form Data Submitted:', formData);
-      setSuccessMsg('Account created successfully! Check console for details.');
+      setSuccessMsg('Account created successfully!');
     }
   };
 
   const renderProgressBar = () => {
     return (
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="flex justify-between mb-2">
-          <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Step {step} of 6</span>
+          <span className="text-xs font-semibold text-[#FF7A00]">Step {step} of 6</span>
         </div>
-        <div className="flex gap-1 h-2">
+        <div className="flex gap-1.5 h-1.5">
           {[1, 2, 3, 4, 5, 6].map((idx) => (
             <div
               key={idx}
-              className={`flex-1 rounded-full transition-colors duration-300 ${
-                idx <= step ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+              className={`flex-1 rounded-full transition-all duration-300 ${
+                idx <= step ? 'bg-[#FF7A00]' : 'bg-white/10'
               }`}
             />
           ))}
@@ -151,38 +151,116 @@ const UserRegister = () => {
     );
   };
 
-  // Helper for input classes
+  // CSS Input Classes helper (Dark Google Maps Style)
   const getInputClasses = (fieldName) => `
-    w-full px-4 py-3 border rounded-xl shadow-sm placeholder-gray-400 
-    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all
-    bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white
-    ${errors[fieldName] ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300'}
+    w-full pl-10 pr-4 py-3 border rounded-xl shadow-sm placeholder-gray-500 
+    focus:outline-none focus:ring-2 focus:ring-[#FF7A00] focus:border-transparent text-sm transition-all
+    bg-black/40 border-white/10 text-white
+    ${errors[fieldName] ? 'border-red-500 bg-red-950/20' : 'border-white/10 hover:border-white/20'}
   `;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-gray-900 dark:to-indigo-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto w-full max-w-[420px]">
-        {successMsg && (
-          <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-xl shadow-sm text-center font-medium animate-fade-in">
-            {successMsg}
+    <div className="min-h-screen bg-black text-white font-sans flex flex-col lg:flex-row mt-16 lg:mt-0">
+      
+      {/* Left Panel: Brand Motivation & Value Props */}
+      <div className="relative w-full lg:w-1/2 flex flex-col justify-between p-8 md:p-16 overflow-hidden min-h-[50vh] lg:min-h-screen">
+        {/* Background Image with Dark & Orange Mask */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity lg:opacity-60" 
+          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1200&auto=format&fit=crop')` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-tr from-black via-black/80 to-transparent lg:bg-gradient-to-r lg:from-black lg:via-black/70 lg:to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FF7A00]/10 to-transparent pointer-events-none" />
+
+        {/* Brand Text */}
+        <div className="relative z-10 max-w-lg mt-8 lg:mt-24">
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight">
+            Join <span className="text-[#FF7A00]">Find Gym</span><br />
+            and Transform Your Life
+          </h1>
+          <p className="text-gray-300 text-sm md:text-base mb-8 leading-relaxed font-light">
+            Discover the best gyms, trainers, and fitness centers near your location. Start your fitness journey today!
+          </p>
+
+          {/* Value Props */}
+          <div className="space-y-5">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white">
+                🏋️
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-white">Top Rated Gyms</h3>
+                <p className="text-xs text-gray-400">Explore 1000+ top rated gyms near you.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white">
+                👤
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-white">Expert Trainers</h3>
+                <p className="text-xs text-gray-400">Train with 500+ certified and experienced trainers.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white">
+                ⭐
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-white">Trusted Reviews</h3>
+                <p className="text-xs text-gray-400">Read real reviews and make informed decisions.</p>
+              </div>
+            </div>
           </div>
-        )}
-        
-        <div className="bg-white dark:bg-gray-800 py-8 px-6 shadow-xl sm:rounded-2xl border border-gray-100 dark:border-gray-700 animate-fade-in transition-all duration-300">
-          <h2 className="mb-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Create Account
+        </div>
+
+        {/* Stats Section inside a glass box */}
+        <div className="relative z-10 mt-12 bg-white/[0.03] backdrop-blur-md border border-white/5 rounded-2xl p-5 max-w-md flex justify-around text-center shadow-xl">
+          <div>
+            <div className="text-2xl md:text-3xl font-extrabold text-[#FF7A00]">1000+</div>
+            <div className="text-[10px] text-gray-400 uppercase tracking-wider mt-1">Gyms</div>
+          </div>
+          <div className="border-l border-white/10" />
+          <div>
+            <div className="text-2xl md:text-3xl font-extrabold text-[#FF7A00]">500+</div>
+            <div className="text-[10px] text-gray-400 uppercase tracking-wider mt-1">Trainers</div>
+          </div>
+          <div className="border-l border-white/10" />
+          <div>
+            <div className="text-2xl md:text-3xl font-extrabold text-[#FF7A00]">50+</div>
+            <div className="text-[10px] text-gray-400 uppercase tracking-wider mt-1">Cities</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Panel: Active Step Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 z-10 lg:min-h-screen">
+        <div className="w-full max-w-[460px] bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-3xl p-6 md:p-8 shadow-2xl relative">
+          
+          {/* Subtle Orange Glow Border Effect */}
+          <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF7A00]/40 to-transparent blur-[1px]" />
+          
+          <h2 className="mb-2 text-2xl font-extrabold tracking-tight">
+            Create <span className="text-[#FF7A00]">Account</span>
           </h2>
           
           {renderProgressBar()}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {successMsg && (
+            <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-center text-sm font-medium">
+              {successMsg}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
             
             {/* Step 1: Email & Phone */}
             {step === 1 && (
-              <div className="space-y-5 animate-fade-in">
+              <div className="space-y-4">
+                {/* Google Sign-up */}
                 <button
                   type="button"
-                  className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-white/10 rounded-xl shadow-sm bg-white/5 text-sm font-semibold text-white hover:bg-white/10 transition-all cursor-pointer"
                 >
                   <svg className="h-5 w-5" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -193,14 +271,15 @@ const UserRegister = () => {
                   Sign up with Google
                 </button>
 
-                <div className="relative flex items-center py-2">
-                  <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
-                  <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">OR</span>
-                  <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+                <div className="relative flex items-center py-1">
+                  <div className="flex-grow border-t border-white/5"></div>
+                  <span className="flex-shrink-0 mx-4 text-gray-500 text-xs tracking-widest uppercase">OR</span>
+                  <div className="flex-grow border-t border-white/5"></div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email address</label>
+                {/* Email field */}
+                <div className="relative">
+                  <span className="absolute left-3.5 top-3.5 text-gray-500">✉️</span>
                   <input
                     name="email"
                     type="email"
@@ -209,46 +288,50 @@ const UserRegister = () => {
                     className={getInputClasses('email')}
                     placeholder="your@email.com"
                   />
-                  {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
+                  {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
                 </div>
 
+                {/* Phone number field */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
                   <div className="flex gap-2">
                     <select
                       name="phoneCode"
                       value={formData.phoneCode}
                       onChange={handleChange}
-                      className="w-1/3 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-[90px] px-2 py-3 border border-white/10 bg-black/60 text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                     >
                       <option value="+91">+91</option>
                       <option value="+1">+1</option>
                       <option value="+44">+44</option>
                     </select>
-                    <input
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className={getInputClasses('phone')}
-                      placeholder="9876543210"
-                    />
+                    <div className="relative flex-grow">
+                      <span className="absolute left-3.5 top-3.5 text-gray-500">📞</span>
+                      <input
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className={getInputClasses('phone')}
+                        placeholder="9876543210"
+                      />
+                    </div>
                   </div>
-                  {errors.phone && <p className="mt-1 text-sm text-red-500">{errors.phone}</p>}
+                  {errors.phone && <p className="mt-1 text-xs text-red-400">{errors.phone}</p>}
                 </div>
 
+                {/* Send OTP button */}
                 {!otpSent ? (
                   <button
                     type="button"
                     onClick={handleSendOTP}
-                    className="w-full py-3 px-4 border border-blue-600 text-blue-600 rounded-xl font-medium hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    className="w-full py-3 px-4 border border-[#FF7A00] text-[#FF7A00] hover:bg-[#FF7A00]/10 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    Send OTP
+                    <span>🚀</span> Send OTP
                   </button>
                 ) : (
-                  <div className="animate-fade-in">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Enter OTP</label>
-                    <div className="flex gap-2">
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-3.5 text-gray-500">🔑</span>
                       <input
                         name="otp"
                         type="text"
@@ -256,17 +339,17 @@ const UserRegister = () => {
                         value={formData.otp}
                         onChange={handleChange}
                         className={getInputClasses('otp')}
-                        placeholder="123456"
+                        placeholder="Enter 6-digit OTP"
                       />
-                      <button
-                        type="button"
-                        onClick={handleSendOTP}
-                        className="px-4 border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-white transition-colors whitespace-nowrap"
-                      >
-                        Resend
-                      </button>
                     </div>
-                    {errors.otp && <p className="mt-1 text-sm text-red-500">{errors.otp}</p>}
+                    {errors.otp && <p className="mt-1 text-xs text-red-400">{errors.otp}</p>}
+                    <button
+                      type="button"
+                      onClick={handleSendOTP}
+                      className="w-full text-right text-xs text-gray-400 hover:text-[#FF7A00]"
+                    >
+                      Resend OTP?
+                    </button>
                   </div>
                 )}
               </div>
@@ -274,182 +357,163 @@ const UserRegister = () => {
 
             {/* Step 2: Password */}
             {step === 2 && (
-              <div className="space-y-5 animate-fade-in">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+              <div className="space-y-4">
+                <div className="relative">
+                  <span className="absolute left-3.5 top-3.5 text-gray-500">🔒</span>
                   <input
                     name="password"
                     type="password"
                     value={formData.password}
                     onChange={handleChange}
                     className={getInputClasses('password')}
-                    placeholder="••••••••"
+                    placeholder="Password"
                   />
-                  
-                  {/* Password requirements */}
-                  <div className="mt-3 space-y-2 text-sm text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center gap-2">
-                      <span className={formData.password.length >= 8 ? 'text-green-500' : ''}>
-                        {formData.password.length >= 8 ? '✓' : '○'} Min 8 characters
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={/[a-zA-Z]/.test(formData.password) ? 'text-green-500' : ''}>
-                        {/[a-zA-Z]/.test(formData.password) ? '✓' : '○'} Contains letters
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={/\d/.test(formData.password) ? 'text-green-500' : ''}>
-                        {/\d/.test(formData.password) ? '✓' : '○'} Contains numbers
-                      </span>
-                    </div>
-                  </div>
-                  {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
+                  {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password}</p>}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-3.5 text-gray-500">🔒</span>
                   <input
                     name="confirmPassword"
                     type="password"
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     className={getInputClasses('confirmPassword')}
-                    placeholder="••••••••"
+                    placeholder="Confirm Password"
                   />
-                  {errors.confirmPassword && <p className="mt-1 text-sm text-red-500">{errors.confirmPassword}</p>}
+                  {errors.confirmPassword && <p className="mt-1 text-xs text-red-400">{errors.confirmPassword}</p>}
+                </div>
+
+                {/* Password meter details */}
+                <div className="p-3 bg-white/5 rounded-xl border border-white/5 space-y-1.5 text-xs text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <span>{formData.password.length >= 8 ? '✅' : '❌'}</span>
+                    <span>Min 8 characters</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>{/[a-zA-Z]/.test(formData.password) ? '✅' : '❌'}</span>
+                    <span>Contains letters</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>{/\d/.test(formData.password) ? '✅' : '❌'}</span>
+                    <span>Contains numbers</span>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Step 3: Profile */}
+            {/* Step 3: Profile Details */}
             {step === 3 && (
-              <div className="space-y-5 animate-fade-in">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Profile Photo</label>
-                  <div className="flex items-center gap-4">
-                    {photoPreview ? (
-                      <div className="relative">
-                        <img src={photoPreview} alt="Preview" className="h-16 w-16 object-cover rounded-full border-2 border-blue-500" />
-                        <button 
-                          type="button" 
-                          onClick={removePhoto}
-                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-500 text-gray-400">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoUpload}
-                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
-                      />
+              <div className="space-y-4">
+                {/* Photo upload wrapper */}
+                <div className="flex items-center gap-4 p-3 bg-white/5 border border-white/5 rounded-xl">
+                  {photoPreview ? (
+                    <div className="relative">
+                      <img src={photoPreview} alt="Preview" className="h-14 w-14 object-cover rounded-full border border-[#FF7A00]" />
+                      <button 
+                        type="button" 
+                        onClick={removePhoto}
+                        className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
+                      >
+                        ×
+                      </button>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="h-14 w-14 rounded-full bg-black/40 flex items-center justify-center border border-dashed border-white/20 text-gray-500 text-xs">
+                      No Photo
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    className="block w-full text-xs text-gray-400 file:mr-4 file:py-1.5 file:px-3.5 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer"
+                  />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-3.5 text-gray-500">👤</span>
                   <input
                     name="fullName"
                     type="text"
                     value={formData.fullName}
                     onChange={handleChange}
                     className={getInputClasses('fullName')}
-                    placeholder="John Doe"
+                    placeholder="Full Name"
                   />
-                  {errors.fullName && <p className="mt-1 text-sm text-red-500">{errors.fullName}</p>}
+                  {errors.fullName && <p className="mt-1 text-xs text-red-400">{errors.fullName}</p>}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Age</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-3.5 text-gray-500">🎂</span>
                     <input
                       name="age"
                       type="number"
-                      min="16"
-                      max="100"
                       value={formData.age}
                       onChange={handleChange}
                       className={getInputClasses('age')}
-                      placeholder="e.g. 25"
+                      placeholder="Age"
                     />
-                    {errors.age && <p className="mt-1 text-sm text-red-500">{errors.age}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender</label>
                     <select
                       name="gender"
                       value={formData.gender}
                       onChange={handleChange}
-                      className={getInputClasses('gender')}
+                      className="w-full px-3 py-3 border border-white/10 bg-black/60 text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                     >
-                      <option value="">Select</option>
+                      <option value="">Gender</option>
                       <option value="male">Male</option>
                       <option value="female">Female</option>
                       <option value="other">Other</option>
                     </select>
-                    {errors.gender && <p className="mt-1 text-sm text-red-500">{errors.gender}</p>}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Height (cm)</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-3.5 text-gray-500">📏</span>
                     <input
                       name="height"
                       type="number"
-                      min="100"
-                      max="250"
                       value={formData.height}
                       onChange={handleChange}
                       className={getInputClasses('height')}
-                      placeholder="e.g. 175"
+                      placeholder="Height (cm)"
                     />
-                    {errors.height && <p className="mt-1 text-sm text-red-500">{errors.height}</p>}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Weight (kg)</label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-3.5 text-gray-500">⚖️</span>
                     <input
                       name="weight"
                       type="number"
-                      min="30"
-                      max="300"
                       value={formData.weight}
                       onChange={handleChange}
                       className={getInputClasses('weight')}
-                      placeholder="e.g. 70"
+                      placeholder="Weight (kg)"
                     />
-                    {errors.weight && <p className="mt-1 text-sm text-red-500">{errors.weight}</p>}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Step 4: Goal */}
+            {/* Step 4: Fitness Goal */}
             {step === 4 && (
-              <div className="space-y-4 animate-fade-in">
-                <label className="block text-base font-medium text-gray-900 dark:text-white mb-2">What is your primary fitness goal?</label>
-                
+              <div className="space-y-3">
+                <p className="text-sm text-gray-300 mb-2">Select your primary fitness goal:</p>
                 {[
                   { id: 'weightLoss', title: 'Weight Loss', desc: 'Burn fat & lose weight' },
                   { id: 'muscle', title: 'Build Muscle', desc: 'Gain strength & muscle' },
                   { id: 'general', title: 'General Fitness', desc: 'Stay healthy & active' },
-                  { id: 'flexibility', title: 'Flexibility & Wellness', desc: 'Yoga, stretching & calm' }
+                  { id: 'flexibility', title: 'Flexibility', desc: 'Yoga & wellness' }
                 ].map((goal) => (
                   <label 
                     key={goal.id}
-                    className={`block relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 ${
+                    className={`block p-3 rounded-xl border cursor-pointer transition-all ${
                       formData.fitnessGoal === goal.id 
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+                        ? 'border-[#FF7A00] bg-[#FF7A00]/5' 
+                        : 'border-white/5 bg-black/40 hover:border-white/10'
                     }`}
                   >
                     <div className="flex items-center">
@@ -459,89 +523,76 @@ const UserRegister = () => {
                         value={goal.id}
                         checked={formData.fitnessGoal === goal.id}
                         onChange={handleChange}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        className="h-4 w-4 text-[#FF7A00] focus:ring-[#FF7A00] border-gray-600 bg-transparent"
                       />
                       <div className="ml-3">
-                        <span className="block text-sm font-medium text-gray-900 dark:text-white">{goal.title}</span>
-                        <span className="block text-sm text-gray-500 dark:text-gray-400">{goal.desc}</span>
+                        <span className="block text-xs font-bold text-white">{goal.title}</span>
+                        <span className="block text-[10px] text-gray-400">{goal.desc}</span>
                       </div>
                     </div>
                   </label>
                 ))}
-                {errors.fitnessGoal && <p className="mt-2 text-sm text-red-500">{errors.fitnessGoal}</p>}
               </div>
             )}
 
             {/* Step 5: Location */}
             {step === 5 && (
-              <div className="space-y-5 animate-fade-in">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State / Region</label>
                   <select
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
-                    className={getInputClasses('location')}
+                    className="w-full px-3 py-3 border border-white/10 bg-black/60 text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                   >
-                    <option value="">Select region</option>
+                    <option value="">Select Region</option>
                     <option value="Maharashtra">Maharashtra</option>
                     <option value="Karnataka">Karnataka</option>
                     <option value="Delhi">Delhi</option>
-                    <option value="Tamil Nadu">Tamil Nadu</option>
-                    <option value="Other">Other</option>
                   </select>
-                  {errors.location && <p className="mt-1 text-sm text-red-500">{errors.location}</p>}
                 </div>
-                
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
                   <select
                     name="city"
                     value={formData.city}
                     onChange={handleChange}
-                    className={getInputClasses('city')}
+                    className="w-full px-3 py-3 border border-white/10 bg-black/60 text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                   >
-                    <option value="">Select city</option>
-                    {['Pimpri', 'Pune', 'Mumbai', 'Bangalore', 'Delhi', 'Hyderabad', 'Chennai', 'Kolkata', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Chandigarh'].map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
+                    <option value="">Select City</option>
+                    <option value="Pune">Pune</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Bangalore">Bangalore</option>
                   </select>
-                  {errors.city && <p className="mt-1 text-sm text-red-500">{errors.city}</p>}
                 </div>
               </div>
             )}
 
-            {/* Step 6: Terms */}
+            {/* Step 6: Agreement */}
             {step === 6 && (
-              <div className="space-y-6 animate-fade-in">
+              <div className="space-y-4 p-3 bg-white/5 border border-white/5 rounded-xl">
                 <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="agreeTerms"
-                      name="agreeTerms"
-                      type="checkbox"
-                      checked={formData.agreeTerms}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="agreeTerms" className="font-medium text-gray-700 dark:text-gray-300">
-                      I agree to the <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>
-                    </label>
-                    {errors.agreeTerms && <p className="mt-1 text-sm text-red-500">{errors.agreeTerms}</p>}
-                  </div>
+                  <input
+                    id="agreeTerms"
+                    name="agreeTerms"
+                    type="checkbox"
+                    checked={formData.agreeTerms}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-[#FF7A00] focus:ring-[#FF7A00] border-gray-600 rounded bg-transparent mt-0.5"
+                  />
+                  <label htmlFor="agreeTerms" className="ml-2.5 text-xs text-gray-300 leading-relaxed">
+                    I agree to the <a href="#" className="text-[#FF7A00] hover:underline">Terms of Service</a> and <a href="#" className="text-[#FF7A00] hover:underline">Privacy Policy</a>
+                  </label>
                 </div>
               </div>
             )}
 
-            {/* Navigation Buttons */}
-            <div className="flex gap-4 pt-4 mt-6 border-t border-gray-100 dark:border-gray-700">
+            {/* Nav controls */}
+            <div className="flex gap-3 pt-3 mt-4 border-t border-white/5">
               {step > 1 && (
                 <button
                   type="button"
                   onClick={handlePrev}
-                  className="w-1/3 py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                  className="w-1/3 py-3 px-4 border border-white/10 rounded-xl font-bold text-xs hover:bg-white/5 transition-colors cursor-pointer"
                 >
                   Back
                 </button>
@@ -551,23 +602,24 @@ const UserRegister = () => {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className={`${step > 1 ? 'w-2/3' : 'w-full'} flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 duration-300`}
+                  className={`${step > 1 ? 'w-2/3' : 'w-full'} flex justify-center items-center py-3 px-4 rounded-xl text-xs font-bold text-white bg-[#FF7A00] hover:bg-[#E66E00] shadow-[0_4px_15px_rgba(255,122,0,0.3)] transition-all transform hover:-translate-y-0.5 cursor-pointer`}
                 >
-                  Next Step
+                  Next Step &rarr;
                 </button>
               ) : (
                 <button
                   type="submit"
-                  className={`${step > 1 ? 'w-2/3' : 'w-full'} flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 duration-300`}
+                  className={`${step > 1 ? 'w-2/3' : 'w-full'} flex justify-center items-center py-3 px-4 rounded-xl text-xs font-bold text-white bg-[#FF7A00] hover:bg-[#E66E00] shadow-[0_4px_15px_rgba(255,122,0,0.3)] transition-all transform hover:-translate-y-0.5 cursor-pointer`}
                 >
                   Create Account
                 </button>
               )}
             </div>
-            
-            <div className="text-center mt-6">
-              <Link to="/login" className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors">
-                Already have an account? Login here
+
+            <div className="text-center mt-5">
+              <span className="text-xs text-gray-400">Already have an account? </span>
+              <Link to="/login" className="text-xs font-bold text-[#FF7A00] hover:underline">
+                Login
               </Link>
             </div>
           </form>
