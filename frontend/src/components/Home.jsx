@@ -233,7 +233,7 @@ const Home = () => {
 
               {/* Coupon Banner Card - Google Maps Offer Style */}
               <div className="mt-6 bg-[#0a0a0a]/75 md:bg-black/60 border border-[#FF7A00]/30 shadow-[0_0_30px_rgba(255,122,0,0.15)] rounded-2xl p-4 md:py-4 md:px-5 flex flex-col md:flex-row items-center justify-between w-full md:max-w-2xl overflow-hidden relative backdrop-blur-md">
-                
+
                 {/* Left side offer content */}
                 <div className="flex flex-col items-start text-left md:w-[52%] z-10">
                   {/* Pill Badge */}
@@ -256,7 +256,7 @@ const Home = () => {
                     <button className="bg-[#FF7A00] hover:bg-[#E66E00] text-white font-bold py-2 px-4 rounded-lg flex items-center gap-1.5 transition-all duration-300 shadow-[0_4px_15px_rgba(255,122,0,0.3)] text-xs cursor-pointer">
                       Claim Offer Now <span>&gt;</span>
                     </button>
-                    
+
                     <span className="flex items-center gap-1.5 text-gray-500 text-[10px] font-semibold">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -278,11 +278,11 @@ const Home = () => {
                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">COUPON CODE</span>
                     <span className="text-xl font-black text-[#FF7A00] tracking-widest mb-2">FINDGYM30</span>
 
-                    <button 
+                    <button
                       onClick={() => {
                         navigator.clipboard.writeText("FINDGYM30");
                         alert("Coupon Code 'FINDGYM30' copied to clipboard!");
-                      }} 
+                      }}
                       className="flex items-center gap-1.5 border border-white/10 hover:border-white/20 bg-white/[0.03] hover:bg-white/[0.07] text-white text-[10px] font-semibold py-1 px-3.5 rounded-md transition-all cursor-pointer"
                     >
                       <span>Copy Code</span>
@@ -294,9 +294,9 @@ const Home = () => {
 
                   {/* Gift Icon illustration float overlay */}
                   <div className="flex items-center justify-center relative flex-shrink-0">
-                    <img 
-                      src={giftBoxImg} 
-                      alt="3D Gift Box" 
+                    <img
+                      src={giftBoxImg}
+                      alt="3D Gift Box"
                       className="w-20 h-20 object-contain drop-shadow-[0_6px_15px_rgba(255,122,0,0.4)] transform rotate-6 hover:rotate-12 transition-transform duration-300"
                     />
                   </div>
@@ -530,7 +530,7 @@ const Home = () => {
           <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] bg-orange-600/5 rounded-full blur-[140px] pointer-events-none"></div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            
+
             {/* Section Header */}
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-16">
               <div className="text-left max-w-xl">
@@ -597,11 +597,10 @@ const Home = () => {
                   <button
                     key={tab}
                     onClick={() => setActiveSupplementTab(tab)}
-                    className={`px-6 py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer transform active:scale-95 ${
-                      isActive 
+                    className={`px-6 py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer transform active:scale-95 ${isActive
                         ? "bg-[#FF7A00]/15 border border-[#FF7A00] text-[#FF7A00] shadow-[0_0_15px_rgba(255,122,0,0.25)]"
                         : "bg-white/[0.02] border border-white/5 text-gray-400 hover:text-white hover:border-white/20"
-                    }`}
+                      }`}
                   >
                     {tab}
                   </button>
@@ -611,7 +610,7 @@ const Home = () => {
 
             {/* Grid of Supplements */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-              
+
               {/* Product 1 */}
               <div className="bg-[#08080a] border border-white/5 hover:border-[#FF7A00]/40 rounded-2xl p-4.5 flex flex-col justify-between transition-all duration-300 shadow-[0_4px_30px_rgba(0,0,0,0.6)] hover:shadow-[0_8px_30px_rgba(255,122,0,0.08)] group relative overflow-hidden">
                 <div className="flex items-center justify-between mb-4 z-10">
@@ -624,13 +623,13 @@ const Home = () => {
                     </svg>
                   </button>
                 </div>
-                
+
                 {/* Image Container with Glow Ring */}
                 <div className="h-36 w-full flex items-center justify-center mb-5 relative">
                   <div className="absolute w-28 h-28 bg-[#FF7A00]/5 group-hover:bg-[#FF7A00]/10 rounded-full blur-xl z-0 transition-all duration-500 scale-90 group-hover:scale-110"></div>
-                  <img 
-                    src="https://images.unsplash.com/photo-1579758629938-03607ccdbaba?q=80&w=400&auto=format&fit=crop" 
-                    alt="ON Whey Protein" 
+                  <img
+                    src="https://images.unsplash.com/photo-1579758629938-03607ccdbaba?q=80&w=400&auto=format&fit=crop"
+                    alt="ON Whey Protein"
                     className="h-28 object-contain z-10 transform group-hover:-translate-y-2 group-hover:rotate-2 transition-all duration-500"
                   />
                 </div>
@@ -675,13 +674,13 @@ const Home = () => {
                     </svg>
                   </button>
                 </div>
-                
+
                 {/* Image Container with Glow Ring */}
                 <div className="h-36 w-full flex items-center justify-center mb-5 relative">
                   <div className="absolute w-28 h-28 bg-[#FF7A00]/5 group-hover:bg-[#FF7A00]/10 rounded-full blur-xl z-0 transition-all duration-500 scale-90 group-hover:scale-110"></div>
-                  <img 
-                    src="https://images.unsplash.com/photo-1593095948071-474c5cc2989d?q=80&w=400&auto=format&fit=crop" 
-                    alt="ON Creatine" 
+                  <img
+                    src="https://images.unsplash.com/photo-1593095948071-474c5cc2989d?q=80&w=400&auto=format&fit=crop"
+                    alt="ON Creatine"
                     className="h-28 object-contain z-10 transform group-hover:-translate-y-2 group-hover:rotate-2 transition-all duration-500"
                   />
                 </div>
@@ -726,13 +725,13 @@ const Home = () => {
                     </svg>
                   </button>
                 </div>
-                
+
                 {/* Image Container with Glow Ring */}
                 <div className="h-36 w-full flex items-center justify-center mb-5 relative">
                   <div className="absolute w-28 h-28 bg-[#FF7A00]/5 group-hover:bg-[#FF7A00]/10 rounded-full blur-xl z-0 transition-all duration-500 scale-90 group-hover:scale-110"></div>
-                  <img 
-                    src="https://images.unsplash.com/photo-1611926653458-09294b3142bf?q=80&w=400&auto=format&fit=crop" 
-                    alt="Muscletech Multivitamin" 
+                  <img
+                    src="https://images.unsplash.com/photo-1611926653458-09294b3142bf?q=80&w=400&auto=format&fit=crop"
+                    alt="Muscletech Multivitamin"
                     className="h-28 object-contain z-10 transform group-hover:-translate-y-2 group-hover:rotate-2 transition-all duration-500"
                   />
                 </div>
@@ -777,13 +776,13 @@ const Home = () => {
                     </svg>
                   </button>
                 </div>
-                
+
                 {/* Image Container with Glow Ring */}
                 <div className="h-36 w-full flex items-center justify-center mb-5 relative">
                   <div className="absolute w-28 h-28 bg-[#FF7A00]/5 group-hover:bg-[#FF7A00]/10 rounded-full blur-xl z-0 transition-all duration-500 scale-90 group-hover:scale-110"></div>
-                  <img 
-                    src="https://images.unsplash.com/photo-1512152272829-e3139592d56f?q=80&w=400&auto=format&fit=crop" 
-                    alt="Cellucor Preworkout" 
+                  <img
+                    src="https://images.unsplash.com/photo-1512152272829-e3139592d56f?q=80&w=400&auto=format&fit=crop"
+                    alt="Cellucor Preworkout"
                     className="h-28 object-contain z-10 transform group-hover:-translate-y-2 group-hover:rotate-2 transition-all duration-500"
                   />
                 </div>
@@ -826,13 +825,13 @@ const Home = () => {
                     </svg>
                   </button>
                 </div>
-                
+
                 {/* Image Container with Glow Ring */}
                 <div className="h-36 w-full flex items-center justify-center mb-5 relative">
                   <div className="absolute w-28 h-28 bg-[#FF7A00]/5 group-hover:bg-[#FF7A00]/10 rounded-full blur-xl z-0 transition-all duration-500 scale-90 group-hover:scale-110"></div>
-                  <img 
-                    src="https://images.unsplash.com/photo-1579758682665-53a1a614eea6?q=80&w=400&auto=format&fit=crop" 
-                    alt="ON Serious Mass" 
+                  <img
+                    src="https://images.unsplash.com/photo-1579758682665-53a1a614eea6?q=80&w=400&auto=format&fit=crop"
+                    alt="ON Serious Mass"
                     className="h-28 object-contain z-10 transform group-hover:-translate-y-2 group-hover:rotate-2 transition-all duration-500"
                   />
                 </div>
@@ -997,7 +996,7 @@ const Home = () => {
         <div className="pb-20 bg-[#000000] px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-7xl mx-auto">
             <div className="relative bg-gradient-to-br from-[#0c0c0e] to-[#050506] rounded-3xl overflow-hidden border border-gray-800 flex flex-col lg:flex-row items-center justify-between p-8 md:p-12 shadow-[0_10px_40px_rgba(0,0,0,0.7)] gap-8">
-              
+
               {/* Background ambient glow */}
               <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#FF7A00]/5 blur-3xl pointer-events-none" />
               <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-orange-600/5 blur-3xl pointer-events-none" />
@@ -1012,7 +1011,7 @@ const Home = () => {
                 <h2 className="text-3xl md:text-5xl font-black text-white mb-2 tracking-tight leading-tight">
                   Ready for <span className="text-[#FF7A00] drop-shadow-[0_0_10px_rgba(255,122,0,0.3)]">Healthy Food</span>?
                 </h2>
-                
+
                 {/* Dynamic Dish Name Sub-heading */}
                 <h3 className="text-xl md:text-2xl font-bold text-white mb-3 flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#FF7A00]"></span>
@@ -1043,15 +1042,15 @@ const Home = () => {
               <div className="relative z-20 lg:w-[40%] w-full flex flex-col justify-center items-center min-h-[300px]">
                 {/* Glowing Circle Backdrop */}
                 <div className="absolute w-56 h-56 rounded-full bg-gradient-to-tr from-[#FF7A00]/20 to-orange-500/10 blur-xl"></div>
-                
+
                 {/* Main Plate Image (With Framer Motion for change animation) */}
-                <motion.img 
+                <motion.img
                   key={activeDishIndex}
                   initial={{ opacity: 0, rotate: -45, scale: 0.8 }}
                   animate={{ opacity: 1, rotate: 6, scale: 1 }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
-                  src={healthyDishes[activeDishIndex].image} 
-                  alt={healthyDishes[activeDishIndex].name} 
+                  src={healthyDishes[activeDishIndex].image}
+                  alt={healthyDishes[activeDishIndex].name}
                   className="w-52 h-52 md:w-60 md:h-60 object-cover rounded-full border border-[#FF7A00]/30 shadow-[0_10px_30px_rgba(255,122,0,0.3)] transform hover:rotate-12 transition-transform duration-500 relative z-10"
                 />
 
@@ -1073,7 +1072,7 @@ const Home = () => {
 
               {/* Navigation Arrows Group in the Bottom-Right Corner of the Box */}
               <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-30 flex gap-2.5">
-                <button 
+                <button
                   onClick={() => setActiveDishIndex((prev) => (prev === 0 ? healthyDishes.length - 1 : prev - 1))}
                   className="w-9 h-9 rounded-full bg-black/60 hover:bg-[#FF7A00] border border-white/10 hover:border-[#FF7A00] text-white hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-lg hover:scale-105 active:scale-95"
                   title="Previous Dish"
@@ -1083,7 +1082,7 @@ const Home = () => {
                   </svg>
                 </button>
 
-                <button 
+                <button
                   onClick={() => setActiveDishIndex((prev) => (prev === healthyDishes.length - 1 ? 0 : prev + 1))}
                   className="w-9 h-9 rounded-full bg-black/60 hover:bg-[#FF7A00] border border-white/10 hover:border-[#FF7A00] text-white hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-lg hover:scale-105 active:scale-95"
                   title="Next Dish"

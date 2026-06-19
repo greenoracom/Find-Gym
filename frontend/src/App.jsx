@@ -23,6 +23,8 @@ import FindGymsPage from './pages/FindGymsPage';
 import RegisterGymPage from './pages/RegisterGymPage';
 import GymDetails from './pages/GymDetails';
 import GymSetup from './pages/GymSetup';
+import Categories from './pages/Categories';
+import HealthStoreRegister from './pages/HealthStoreRegister';
 
 // Conditional Navbar wrapper
 const Navigation = () => {
@@ -36,7 +38,8 @@ const Navigation = () => {
   if (
     hideNav.includes(location.pathname) ||
     location.pathname.startsWith('/gym-owner') ||
-    location.pathname.startsWith('/gym-setup')
+    location.pathname.startsWith('/gym-setup') ||
+    location.pathname.startsWith('/health-store/register')
   ) return null;
   return <Navbar />;
 };
@@ -51,7 +54,8 @@ const FooterWrapper = () => {
   ];
   if (
     hideFooter.includes(location.pathname) ||
-    location.pathname.startsWith('/gym-owner')
+    location.pathname.startsWith('/gym-owner') ||
+    location.pathname.startsWith('/health-store/register')
   ) return null;
   return <Footer />;
 };
@@ -152,7 +156,9 @@ function App() {
 
             <Route path="/gym-details" element={<GymDetails />} />
             <Route path="/gym-setup/:gymId" element={<GymSetup />} />
-          </Routes>
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/health-store/register/:token" element={<HealthStoreRegister />} />
+           </Routes>
         </div>
         <div className={`pb-[70px] lg:pb-0 transition-all duration-300 ${sidebarCollapsed ? "lg:pr-0" : "lg:pr-[100px]"}`}>
           <FooterWrapper />

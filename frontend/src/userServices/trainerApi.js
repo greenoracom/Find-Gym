@@ -43,6 +43,16 @@ export const reapplyTrainer = async (formData) => {
   return response.data;
 };
 
+export const getTrainerBookings = async () => {
+  const response = await api.get('/trainer/bookings');
+  return response.data;
+};
+
+export const getTrainerEarnings = async () => {
+  const response = await api.get('/trainer/earnings');
+  return response.data;
+};
+
 // --------------- PUBLIC ---------------
 export const getPublicTrainers = async (params) => {
   const response = await api.get('/public/trainers', { params });

@@ -4,7 +4,9 @@ import {
   getTrainerProfile,
   getTrainerStatus,
   updateAvailability,
-  reapplyTrainer
+  reapplyTrainer,
+  getTrainerBookings,
+  getTrainerEarnings
 } from '../../userServices/trainerApi';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -30,6 +32,10 @@ const TrainerDashboard = () => {
   const [updatingAvail, setUpdatingAvail] = useState(false);
   const [availMsg, setAvailMsg] = useState('');
 
+  // Bookings & Earnings state
+  const [bookings, setBookings] = useState([]);
+  const [earnings, setEarnings] = useState(null);
+
   // Tab state (for active users)
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -46,6 +52,24 @@ const TrainerDashboard = () => {
         setProfile(profileRes.trainer);
         setAvailDays(profileRes.trainer.availability?.days || []);
         setAvailSlots(profileRes.trainer.availability?.timeSlots || []);
+      }
+
+      try {
+        const bookingsRes = await getTrainerBookings();
+        if (bookingsRes.success) {
+          setBookings(bookingsRes.bookings || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch bookings:", err);
+      }
+
+      try {
+        const earningsRes = await getTrainerEarnings();
+        if (earningsRes.success) {
+          setEarnings(earningsRes.earnings);
+        }
+      } catch (err) {
+        console.error("Failed to fetch earnings:", err);
       }
     } catch (err) {
       setError('Session expired or unauthorized.');
@@ -441,13 +465,114 @@ const TrainerDashboard = () => {
             )}
 
             {activeTab === 'earnings' && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm space-y-6 animate-in fade-in duration-200">
-                <div>
-                  <h3 className="text-xl font-bold text-slate-800">Earnings & Bookings</h3>
-                  <p className="text-slate-500 text-sm">Check your payouts and booking status details.</p>
+              <div className="space-y-6 animate-in fade-in duration-200">
+                {/* Earnings Summary Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <span className="text-slate-400 text-xs font-bold uppercase tracking-wider block mb-1">Total Earnings</span>
+                    <span className="text-3xl font-black text-emerald-600">₹{earnings?.total || 0}</span>
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <span className="text-slate-400 text-xs font-bold uppercase tracking-wider block mb-1">Pending Payouts</span>
+                    <span className="text-3xl font-black text-orange-600">₹{earnings?.pending || 0}</span>
+                  </div>
                 </div>
-                <div className="p-12 border border-dashed border-slate-300 rounded-xl text-center text-slate-450 text-sm">
-                  📈 Bookings list and payout history will appear here once you receive client requests.
+
+                {/* Client Bookings List */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-800">Client Bookings</h3>
+                    <p className="text-slate-500 text-xs">A list of all booking requests and sessions.</p>
+                  </div>
+                  
+                  {bookings.length > 0 ? (
+                    <div className="overflow-x-auto border border-slate-100 rounded-xl">
+                      <table className="w-full text-left border-collapse text-sm">
+                        <thead>
+                          <tr className="bg-slate-50 text-slate-600 font-bold border-b border-slate-100">
+                            <th className="p-3.5">ID</th>
+                            <th className="p-3.5">Client Name</th>
+                            <th className="p-3.5">Format</th>
+                            <th className="p-3.5">Date</th>
+                            <th className="p-3.5">Time Slot</th>
+                            <th className="p-3.5">Amount</th>
+                            <th className="p-3.5 text-right">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-105/40 text-slate-700">
+                          {bookings.map((booking) => (
+                            <tr key={booking.id} className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-3.5 font-mono text-xs text-slate-400">{booking.id}</td>
+                              <td className="p-3.5 font-semibold text-slate-800">{booking.clientName}</td>
+                              <td className="p-3.5">
+                                <span className="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded-full font-medium">{booking.type}</span>
+                              </td>
+                              <td className="p-3.5">{booking.date}</td>
+                              <td className="p-3.5 text-slate-500">{booking.time}</td>
+                              <td className="p-3.5 font-bold text-slate-900">₹{booking.price}</td>
+                              <td className="p-3.5 text-right">
+                                <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                                  booking.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-700' :
+                                  booking.status === 'Completed' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
+                                }`}>
+                                  {booking.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="p-12 border border-dashed border-slate-200 rounded-xl text-center text-slate-400 text-sm">
+                      📈 Bookings list will appear here once you receive client requests.
+                    </div>
+                  )}
+                </div>
+
+                {/* Payout Transactions List */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-800">Payout Transactions</h3>
+                    <p className="text-slate-500 text-xs">History of payouts transferred to your bank account.</p>
+                  </div>
+                  
+                  {earnings?.transactions?.length > 0 ? (
+                    <div className="overflow-x-auto border border-slate-100 rounded-xl">
+                      <table className="w-full text-left border-collapse text-sm">
+                        <thead>
+                          <tr className="bg-slate-50 text-slate-600 font-bold border-b border-slate-100">
+                            <th className="p-3.5">Tx ID</th>
+                            <th className="p-3.5">Booking ID</th>
+                            <th className="p-3.5">Amount</th>
+                            <th className="p-3.5">Type</th>
+                            <th className="p-3.5">Date</th>
+                            <th className="p-3.5 text-right">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-105/40 text-slate-700">
+                          {earnings.transactions.map((tx) => (
+                            <tr key={tx.id} className="hover:bg-slate-50/50 transition-colors">
+                              <td className="p-3.5 font-mono text-xs text-slate-400">{tx.id}</td>
+                              <td className="p-3.5 font-mono text-xs text-slate-500">{tx.bookingId}</td>
+                              <td className="p-3.5 font-bold text-emerald-600">₹{tx.amount}</td>
+                              <td className="p-3.5 text-slate-600">{tx.type}</td>
+                              <td className="p-3.5 text-slate-500">{tx.date}</td>
+                              <td className="p-3.5 text-right">
+                                <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+                                  {tx.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="p-12 border border-dashed border-slate-200 rounded-xl text-center text-slate-400 text-sm">
+                      💸 Payout transactions history is empty.
+                    </div>
+                  )}
                 </div>
               </div>
             )}

@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getUserProfile, updateUserProfile } from "../userServices/Auth";
+import { getUserOrders } from "../userServices/publicHealthStoreApi";
 import toast from "react-hot-toast";
 import { X, Camera, User, Phone, Ruler, Scale, MapPin, Target } from "lucide-react";
 
 const UserProfile = () => {
   const [profileData, setProfileData] = useState(null);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -39,6 +41,15 @@ const UserProfile = () => {
         const res = await getUserProfile();
         if (res.success) {
           setProfileData(res.data);
+          // Fetch orders
+          try {
+            const ordersRes = await getUserOrders();
+            if (ordersRes.success) {
+              setOrders(ordersRes.data || []);
+            }
+          } catch (oErr) {
+            console.error("Error loading orders:", oErr);
+          }
         } else {
           toast.error("Failed to load profile details");
           navigate("/login");
@@ -113,6 +124,65 @@ const UserProfile = () => {
     localStorage.removeItem("userName");
     toast.success("Logged out successfully!");
     navigate("/login");
+  };
+
+  const renderTrackingTimeline = (status) => {
+    if (['Cancelled', 'Refunded'].includes(status)) {
+      return (
+        <div className="flex items-center gap-2 text-red-500 bg-red-500/10 border border-red-500/20 px-4 py-2.5 rounded-xl text-xs font-semibold">
+          <span>❌</span> Order status: {status}
+        </div>
+      );
+    }
+
+    const steps = [
+      { label: 'Placed', statusKey: 'Pending' },
+      { label: 'Packed', statusKey: 'Packed' },
+      { label: 'Shipped', statusKey: 'Shipped' },
+      { label: 'Delivered', statusKey: 'Delivered' }
+    ];
+
+    let currentIndex = 0;
+    if (status === 'Confirmed' || status === 'Pending') currentIndex = 0;
+    else if (status === 'Packed') currentIndex = 1;
+    else if (status === 'Shipped') currentIndex = 2;
+    else if (status === 'Delivered') currentIndex = 3;
+
+    return (
+      <div className="w-full mt-4 bg-[#070708] border border-white/5 rounded-2xl p-4">
+        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-4">Order Tracking Timeline</p>
+        <div className="flex items-center justify-between relative px-2">
+          {/* Progress line connector */}
+          <div className="absolute left-6 right-6 top-[15px] h-[2px] bg-white/10 z-0">
+            <div 
+              className="h-full bg-gradient-to-r from-[#FF7A00] to-orange-400 transition-all duration-500"
+              style={{ width: `${(currentIndex / (steps.length - 1)) * 100}%` }}
+            />
+          </div>
+
+          {/* Steps rendering */}
+          {steps.map((step, idx) => {
+            const isCompleted = idx <= currentIndex;
+            return (
+              <div key={idx} className="flex flex-col items-center relative z-10">
+                <div 
+                  className={`w-8 h-8 rounded-full flex items-center justify-center border font-bold text-xs transition-all duration-300 ${
+                    isCompleted 
+                      ? 'bg-[#FF7A00] border-[#FF7A00] text-white shadow-[0_0_10px_rgba(255,122,0,0.4)]' 
+                      : 'bg-[#111112] border-white/10 text-gray-500'
+                  }`}
+                >
+                  {isCompleted ? '✓' : idx + 1}
+                </div>
+                <span className={`text-[9px] font-bold mt-2 ${isCompleted ? 'text-white' : 'text-gray-500'}`}>
+                  {step.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   // Modal handlers
@@ -206,7 +276,7 @@ const UserProfile = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Sidebar Panel (4 columns) */}
-        <div className="lg:col-span-3 bg-[#111112] border border-white/5 rounded-3xl p-6 flex flex-col items-center relative overflow-hidden shadow-xl">
+        <div className="lg:col-span-3 lg:sticky lg:top-28 bg-[#111112] border border-white/5 rounded-3xl p-6 flex flex-col items-center relative overflow-hidden shadow-xl">
           {/* Avatar Area */}
           <div className="relative mb-4">
             <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#FF7A00] to-orange-400 p-[1px] blur-[3px]" />
@@ -366,17 +436,100 @@ const UserProfile = () => {
             </div>
           </div>
 
-          {/* Horizontal Grid of 4 Health Badges */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {user.healthBadges.map((badge) => (
-              <div key={badge.id} className="bg-[#111112] border border-white/5 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
-                <span className="text-xl bg-white/5 w-8 h-8 rounded-lg flex items-center justify-center border border-white/5">{badge.icon}</span>
-                <div>
-                  <p className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">{badge.label}</p>
-                  <p className="text-xs font-extrabold text-white mt-0.5">{badge.value}</p>
-                </div>
+          {/* Orders Tracking Section */}
+          <div className="bg-[#111112] border border-white/5 rounded-3xl p-5 md:p-6 shadow-xl space-y-6">
+            <div className="flex justify-between items-center border-b border-white/5 pb-3">
+              <h3 className="font-black text-sm text-white flex items-center gap-2">📦 My Orders & Tracking</h3>
+              <span className="text-[10px] bg-[#FF7A00]/10 border border-[#FF7A00]/25 text-[#FF7A00] px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+                {orders.filter(o => o.paymentStatus === 'Paid').length} Orders
+              </span>
+            </div>
+
+            {orders.filter(o => o.paymentStatus === 'Paid').length > 0 ? (
+              <div className="space-y-6">
+                {orders.filter(o => o.paymentStatus === 'Paid').map((order) => (
+                  <div key={order._id} className="p-4 md:p-5 bg-black/40 border border-white/5 rounded-2xl space-y-4">
+                    {/* Order Meta Header */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/5 pb-3">
+                      <div>
+                        <p className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">Order Number</p>
+                        <p className="text-xs font-black text-white mt-0.5">{order.orderNumber}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">Date Placed</p>
+                        <p className="text-[10px] font-semibold text-gray-300 mt-0.5">
+                          {new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <span className={`px-2.5 py-1 rounded-md text-[8px] font-extrabold uppercase tracking-wider ${
+                          order.paymentStatus === 'Paid' 
+                            ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' 
+                            : 'bg-yellow-500/10 border border-yellow-500/20 text-yellow-400'
+                        }`}>
+                          {order.paymentStatus}
+                        </span>
+                        <span className={`px-2.5 py-1 rounded-md text-[8px] font-extrabold uppercase tracking-wider ${
+                          ['Delivered', 'Confirmed'].includes(order.orderStatus)
+                            ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+                            : order.orderStatus === 'Cancelled'
+                            ? 'bg-red-500/10 border border-red-500/20 text-red-400'
+                            : 'bg-[#FF7A00]/10 border border-[#FF7A00]/25 text-[#FF7A00]'
+                        }`}>
+                          {order.orderStatus}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Order Items */}
+                    <div className="space-y-3">
+                      {order.items.map((item, idx) => (
+                        <div key={idx} className="flex justify-between items-center gap-4 bg-[#111112]/40 p-3 rounded-xl border border-white/[0.02]">
+                          <div className="flex items-center gap-3">
+                            {item.image ? (
+                              <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg border border-white/5" />
+                            ) : (
+                              <div className="w-12 h-12 bg-black flex items-center justify-center rounded-lg text-lg border border-white/5">
+                                {item.productType === 'Diet' ? '🥗' : '💊'}
+                              </div>
+                            )}
+                            <div>
+                              <h4 className="font-bold text-xs text-white leading-tight">{item.name}</h4>
+                              <p className="text-[10px] text-gray-500 mt-1">
+                                Qty: <span className="font-semibold text-gray-300">{item.quantity}</span>
+                                {item.purchaseType === 'Monthly' && <span className="ml-2 text-[#FF7A00] font-bold">Monthly Plan</span>}
+                              </p>
+                            </div>
+                          </div>
+                          <span className="font-extrabold text-xs text-white">₹{item.price * item.quantity}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Tracking Timeline */}
+                    {renderTrackingTimeline(order.orderStatus)}
+
+                    {/* Delivery & Pricing Details */}
+                    <div className="text-[10px] text-gray-400 border-t border-white/5 pt-3 flex flex-col sm:flex-row justify-between gap-2">
+                      <p className="leading-relaxed">
+                        📍 <span className="font-bold text-gray-300">Deliver to:</span> {order.address?.address || order.address}
+                      </p>
+                      <p className="font-bold text-white shrink-0">
+                        Paid Total: <span className="text-[#FF7A00] text-xs">₹{order.total}</span>
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <div className="flex flex-col items-center justify-center py-10 text-center text-zinc-500 text-xs gap-3">
+                <span className="text-3xl">🛒</span>
+                <p>No orders placed yet.</p>
+                <Link to="/categories" className="px-4 py-2 bg-[#FF7A00] hover:bg-orange-600 text-white font-bold text-[10px] rounded-xl transition-all uppercase tracking-wider">
+                  Browse Health Store &rarr;
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Bottom Grid: Recent Bookings & Saved Gyms */}

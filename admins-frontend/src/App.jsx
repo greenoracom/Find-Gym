@@ -38,6 +38,31 @@ import CAActivityLogs from './admins/components/CityAdminDashboard/ActivityLogs/
 import CASettings from './admins/components/CityAdminDashboard/Settings/Settings';
 import CAGymOwnersList from './admins/components/CityAdminDashboard/GymOwners/GymOwnersList';
 
+// City Admin Health Store imports
+import HealthStoreList from './admins/components/CityAdminDashboard/HealthStores/HealthStoreList';
+import AddHealthStore from './admins/components/CityAdminDashboard/HealthStores/AddHealthStore';
+import HealthStoreDetails from './admins/components/CityAdminDashboard/HealthStores/HealthStoreDetails';
+import ProductApprovals from './admins/components/CityAdminDashboard/HealthStores/ProductApprovals';
+
+// Health Store Owner imports
+import HealthStoreOwnerDashboard from './pages/HealthStoreOwnerDashboard';
+import HealthStoreLogin from './admins/components/HealthStoreOwner/Auth/HealthStoreLogin';
+import HealthStoreSetPassword from './admins/components/HealthStoreOwner/Auth/HealthStoreSetPassword';
+import HSDashboard from './admins/components/HealthStoreOwner/Dashboard/Dashboard';
+import StoreProfile from './admins/components/HealthStoreOwner/StoreProfile/StoreProfile';
+import DietFoodList from './admins/components/HealthStoreOwner/Products/DietFoodList';
+import AddDietFood from './admins/components/HealthStoreOwner/Products/AddDietFood';
+import DietFoodsLayout from './admins/components/HealthStoreOwner/Products/DietFoodsLayout';
+import DietFoodsDashboard from './admins/components/HealthStoreOwner/Products/DietFoodsDashboard';
+import DietFoodPayments from './admins/components/HealthStoreOwner/Products/DietFoodPayments';
+import SupplementsDashboard from './admins/components/HealthStoreOwner/Products/SupplementsDashboard';
+import SupplementList from './admins/components/HealthStoreOwner/Products/SupplementList';
+import AddSupplement from './admins/components/HealthStoreOwner/Products/AddSupplement';
+import SupplementsLayout from './admins/components/HealthStoreOwner/Products/SupplementsLayout';
+import SupplementPayments from './admins/components/HealthStoreOwner/Products/SupplementPayments';
+import OrdersList from './admins/components/HealthStoreOwner/Orders/OrdersList';
+import HealthStoreRegister from './admins/components/HealthStoreOwner/Auth/HealthStoreRegister';
+
 function App() {
   return (
     <BrowserRouter>
@@ -46,7 +71,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/admin/login" element={<Navigate to="/login" replace />} />
         <Route path="/admin/setup-password" element={<SetupPassword />} />
-        
+
         <Route path="/super-admin" element={<SuperAdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="users" element={<UsersList />} />
@@ -85,9 +110,42 @@ function App() {
           <Route path="gym-owners" element={<CAGymOwnersList />} />
           <Route path="trainers" element={<CATrainersList />} />
           <Route path="dietitians" element={<CADietitiansList />} />
+
+          {/* Health Store Management */}
+          <Route path="health-stores" element={<HealthStoreList />} />
+          <Route path="health-stores/add" element={<AddHealthStore />} />
+          <Route path="health-stores/:id" element={<HealthStoreDetails />} />
+          <Route path="health-stores/approvals" element={<ProductApprovals />} />
+
           <Route path="analytics" element={<CAAnalytics />} />
           <Route path="activity-logs" element={<CAActivityLogs />} />
           <Route path="settings" element={<CASettings />} />
+        </Route>
+
+        {/* Health Store Owner Panel Routes */}
+        <Route path="/health-store-owner/login" element={<HealthStoreLogin />} />
+        <Route path="/health-store/register/:token" element={<HealthStoreRegister />} />
+        <Route path="/health-store/set-password/:token" element={<HealthStoreSetPassword />} />
+
+        <Route path="/health-store-owner" element={<HealthStoreOwnerDashboard />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<HSDashboard />} />
+          <Route path="profile" element={<StoreProfile />} />
+          <Route path="diet-foods" element={<DietFoodsLayout />}>
+            <Route index element={<DietFoodsDashboard />} />
+            <Route path="list" element={<DietFoodList />} />
+            <Route path="add" element={<AddDietFood />} />
+            <Route path="edit/:id" element={<AddDietFood />} />
+            <Route path="payments" element={<DietFoodPayments />} />
+          </Route>
+          <Route path="supplements" element={<SupplementsLayout />}>
+            <Route index element={<SupplementsDashboard />} />
+            <Route path="list" element={<SupplementList />} />
+            <Route path="add" element={<AddSupplement />} />
+            <Route path="edit/:id" element={<AddSupplement />} />
+            <Route path="payments" element={<SupplementPayments />} />
+          </Route>
+          <Route path="orders" element={<OrdersList />} />
         </Route>
       </Routes>
     </BrowserRouter>

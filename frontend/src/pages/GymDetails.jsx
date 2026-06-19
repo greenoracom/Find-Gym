@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { getGymById } from '../userServices/gymApi';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -62,9 +68,67 @@ const GymDetails = () => {
     fetchGymDetails();
   }, [gymId]);
 
+  useGSAP(() => {
+    if (!gym) return;
+
+    // GSAP ScrollTrigger animations for sections
+    const sections = ['#about', '#facilities', '#trainers', '#plans', '#offers', '#reviews', '#location'];
+    sections.forEach((sectionId) => {
+      const element = document.querySelector(sectionId);
+      if (element) {
+        gsap.fromTo(element,
+          { opacity: 0, y: 50 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: element,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            }
+          }
+        );
+      }
+    });
+
+    // Stagger animate cards inside sections
+    const cardSelectors = [
+      { trigger: '#facilities', targets: '#facilities div.grid > div' },
+      { trigger: '#trainers', targets: '#trainers div.grid > div' },
+      { trigger: '#plans', targets: '#plans div.grid > div' },
+      { trigger: '#offers', targets: '#offers div.grid > div' }
+    ];
+
+    cardSelectors.forEach(({ trigger, targets }) => {
+      const triggerEl = document.querySelector(trigger);
+      const cards = document.querySelectorAll(targets);
+      if (triggerEl && cards.length > 0) {
+        gsap.fromTo(cards,
+          { opacity: 0, y: 30, scale: 0.95 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.05,
+            ease: 'back.out(1.2)',
+            scrollTrigger: {
+              trigger: triggerEl,
+              start: 'top 80%',
+              toggleActions: 'play none none none',
+            }
+          }
+        );
+      }
+    });
+  }, [gym]);
+
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#070708] text-white flex items-center justify-center font-sans">
+      <div className="min-h-screen bg-[#111215] text-white flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-t-orange-500 border-zinc-800 rounded-full animate-spin"></div>
           <p className="text-zinc-400 text-sm font-semibold tracking-wide">Loading Gym Experience...</p>
@@ -75,7 +139,7 @@ const GymDetails = () => {
 
   if (!gym) {
     return (
-      <div className="min-h-screen bg-[#070708] text-white flex flex-col items-center justify-center font-sans p-6">
+      <div className="min-h-screen bg-[#111215] text-white flex flex-col items-center justify-center font-sans p-6">
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 max-w-md text-center shadow-xl">
           <svg className="w-16 h-16 text-zinc-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -272,7 +336,7 @@ const GymDetails = () => {
 
   return (
     <div
-      className="min-h-screen bg-[#070708] text-white font-sans antialiased pb-20 selection:bg-orange-500 selection:text-white select-none relative overflow-x-hidden pt-20"
+      className="min-h-screen bg-[#111215] text-white font-sans antialiased pb-20 selection:bg-orange-500 selection:text-white select-none relative overflow-x-hidden pt-20"
       style={{
         backgroundImage: 'radial-gradient(rgba(249, 115, 22, 0.035) 1.5px, transparent 0), radial-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 0)',
         backgroundSize: '32px 32px, 16px 16px',
@@ -296,7 +360,7 @@ const GymDetails = () => {
         />
 
         {/* Top Radial/Linear dark overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#070708] via-transparent to-black/45 z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#111215] via-transparent to-black/45 z-10"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-transparent to-black/35 z-10"></div>
 
         {/* Slide Counter */}

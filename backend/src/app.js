@@ -19,6 +19,13 @@ const gymRoutes = require('./routes/gymRoutes');
 const trainerAuthRoutes = require('./routes/trainerAuthRoutes');
 const trainerRoutes = require('./routes/trainerRoutes');
 
+// Health Store Routes
+const cityAdminHealthStoreRoutes = require('./routes/cityAdminHealthStoreRoutes');
+const healthStoreAuthRoutes = require('./routes/healthStoreAuthRoutes');
+const healthStoreOwnerRoutes = require('./routes/healthStoreOwnerRoutes');
+const publicHealthStoreRoutes = require('./routes/publicHealthStoreRoutes');
+const healthStorePaymentRoutes = require('./routes/healthStorePaymentRoutes');
+
 const app = express();
 
 // Security headers
@@ -67,6 +74,13 @@ app.use('/api/gyms', gymRoutes);
 // Trainer Routes
 app.use('/api/trainer/auth', trainerAuthRoutes);
 app.use('/api/trainer', trainerRoutes);
+
+// Health Store Routes
+app.use('/api/city-admin/health-stores', cityAdminHealthStoreRoutes);
+app.use('/api/health-store', healthStoreAuthRoutes);
+app.use('/api/health-store-owner', healthStoreOwnerRoutes);
+app.use('/api/health-store/categories', publicHealthStoreRoutes);
+app.use('/api/health-store/payment', healthStorePaymentRoutes);
 
 // Public trainer listing
 const adminTrainerController = require('./controllers/admin/trainerController');

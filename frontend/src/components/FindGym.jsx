@@ -1052,7 +1052,7 @@ const FindGym = () => {
               ) : filteredAndSortedGyms.length > 0 ? (
                 <div className="divide-y divide-gray-150">
                   {filteredAndSortedGyms.map((gym) => {
-                    const gymImage = gym.images?.[0] || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop";
+                    const gymImage = gym.heroImage || gym.images?.[0] || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop";
                     const rating = getRatingValue(gym.rating);
                     const reviewsCount = getReviewsCountValue(gym.rating, gym.reviewsCount || 130);
                     const isSelected = selectedGymDetail && (selectedGymDetail._id === gym._id || selectedGymDetail.id === gym.id);
@@ -1174,7 +1174,7 @@ const FindGym = () => {
             <div className="overflow-y-auto flex-grow min-h-0">
               <div className="relative w-full h-[220px] flex-shrink-0">
                 <img
-                  src={selectedGymDetail.images?.[0] || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"}
+                  src={selectedGymDetail.heroImage || selectedGymDetail.images?.[0] || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"}
                   alt={selectedGymDetail.name}
                   className="w-full h-full object-cover"
                 />
@@ -1253,15 +1253,6 @@ const FindGym = () => {
                       <span className="text-[10px] font-bold text-[#1a73e8] group-hover:underline">Directions</span>
                     </button>
 
-                    <button className="flex flex-col items-center gap-1.5 group w-[64px] cursor-pointer">
-                      <div className="w-[36px] h-[36px] rounded-full bg-[#e8f5e9] hover:bg-[#c8e6c9] flex items-center justify-center text-[#2e7d32] shadow-sm transition-all">
-                        <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                          <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" />
-                        </svg>
-                      </div>
-                      <span className="text-[10px] font-bold text-[#2e7d32] group-hover:underline">Saved (2)</span>
-                    </button>
-
                     <button 
                       onClick={() => navigate(`/gym-details?id=${selectedGymDetail._id || selectedGymDetail.id}`)}
                       className="flex flex-col items-center gap-1.5 group w-[64px] cursor-pointer"
@@ -1278,33 +1269,12 @@ const FindGym = () => {
 
                     <button className="flex flex-col items-center gap-1.5 group w-[64px] cursor-pointer">
                       <div className="w-[36px] h-[36px] rounded-full bg-[#e0f7fa] hover:bg-[#b2ebf2] flex items-center justify-center text-[#00838f] shadow-sm transition-all">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
-                        </svg>
-                      </div>
-                      <span className="text-[10px] font-bold text-[#1a73e8] group-hover:underline leading-tight">Send to phone</span>
-                    </button>
-
-                    <button className="flex flex-col items-center gap-1.5 group w-[64px] cursor-pointer">
-                      <div className="w-[36px] h-[36px] rounded-full bg-[#e0f7fa] hover:bg-[#b2ebf2] flex items-center justify-center text-[#00838f] shadow-sm transition-all">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186l5.572 3.251m-5.572-3.251l5.56-3.248a2.25 2.25 0 1 1 3.06 3.19l-5.56 3.248m5.57 1.09a2.25 2.25 0 1 1-3.136 3.062l-5.572-3.251" />
                         </svg>
                       </div>
                       <span className="text-[10px] font-bold text-[#1a73e8] group-hover:underline">Share</span>
                     </button>
-                  </div>
-
-                  <div className="px-5 py-3 border-b border-gray-150 bg-gray-50 flex items-center justify-between text-[13px] text-gray-700 font-medium select-none">
-                    <div className="flex items-center gap-3">
-                      <svg className="w-5 h-5 text-[#2e7d32] fill-current" viewBox="0 0 24 24">
-                        <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z" />
-                      </svg>
-                      <span>Saved in Want to go & Want to go</span>
-                    </div>
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                    </svg>
                   </div>
 
                   <div className="p-5 flex flex-col gap-5 text-gray-800 text-[13.5px]">

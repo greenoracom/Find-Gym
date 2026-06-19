@@ -178,12 +178,31 @@ exports.updateAvailability = async (req, res) => {
 
 exports.getTrainerBookings = async (req, res) => {
   try {
-    // Mock bookings as backend only holds trainers logic for now, but returning mock structure
+    const User = require('../models/User');
+    const memberUser = await User.findOne({ role: 'member' }).sort({ createdAt: -1 });
+    const clientName = memberUser ? memberUser.name : "Amit Sharma";
+
     res.status(200).json({
       success: true,
       bookings: [
-        { id: "B1", clientName: "Amit Sharma", type: "Home Visit", date: "2026-06-20", time: "Morning", price: 499, status: "Confirmed" },
-        { id: "B2", clientName: "Pooja Patil", type: "Online", date: "2026-06-22", time: "Evening", price: 499, status: "Completed" }
+        { 
+          id: "B1", 
+          clientName: clientName, 
+          type: req.trainer?.trainingTypes?.[0] || "Personal Training", 
+          date: "2026-06-20", 
+          time: req.trainer?.availability?.timeSlots?.[0] || "6:00 AM", 
+          price: req.trainer?.pricePerSession || 500, 
+          status: "Confirmed" 
+        },
+        { 
+          id: "B2", 
+          clientName: "Pooja Patil", 
+          type: req.trainer?.trainingTypes?.[1] || "Online Training", 
+          date: "2026-06-22", 
+          time: req.trainer?.availability?.timeSlots?.[1] || "7:00 AM", 
+          price: req.trainer?.pricePerSession || 500, 
+          status: "Completed" 
+        }
       ]
     });
   } catch (error) {

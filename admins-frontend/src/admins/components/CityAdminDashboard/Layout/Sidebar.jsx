@@ -11,6 +11,8 @@ const Sidebar = () => {
     { name: 'Gym Owner Requests', path: '/city-admin/gym-owners', icon: '📝' },
     { name: 'Trainers', path: '/city-admin/trainers', icon: '🏋️' },
     { name: 'Dietitians', path: '/city-admin/dietitians', icon: '🥗' },
+    { name: 'Health Stores', path: '/city-admin/health-stores', icon: '🏪' },
+    { name: 'Product Approvals', path: '/city-admin/health-stores/approvals', icon: '🍏' },
     { name: 'Analytics', path: '/city-admin/analytics', icon: '📈' },
     { name: 'Activity Logs', path: '/city-admin/activity-logs', icon: '📜' },
     { name: 'Settings', path: '/city-admin/settings', icon: '⚙️' },
@@ -31,7 +33,13 @@ const Sidebar = () => {
       </div>
       <nav className="flex-1 px-4 py-6 space-y-2">
         {navItems.map((item) => {
-          const isActive = location.pathname.startsWith(item.path);
+          let isActive = false;
+          if (item.path === '/city-admin/health-stores') {
+            isActive = location.pathname === '/city-admin/health-stores' || 
+              (location.pathname.startsWith('/city-admin/health-stores/') && !location.pathname.includes('/approvals'));
+          } else {
+            isActive = location.pathname.startsWith(item.path);
+          }
           return (
             <Link
               key={item.name}
@@ -43,7 +51,7 @@ const Sidebar = () => {
               }`}
             >
               <span className="text-xl group-hover:scale-110 transition-transform">{item.icon}</span>
-              <span className="font-medium">{item.name}</span>
+              <span className="font-medium text-sm">{item.name}</span>
             </Link>
           );
         })}

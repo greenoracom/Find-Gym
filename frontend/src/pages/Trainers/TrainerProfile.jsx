@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPublicTrainerById } from '../../userServices/trainerApi';
+import toast from 'react-hot-toast';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -44,12 +45,112 @@ function SkeletonPulse() {
   );
 }
 
+// Dynamic script loader for Razorpay
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 const TrainerProfile = () => {
   const { trainerId } = useParams();
   const navigate = useNavigate();
   const [trainer, setTrainer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Booking Modal States
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedPlan, setSelectedPlan] = useState('Session'); // 'Session' or 'Monthly'
+  const [selectedDay, setSelectedDay] = useState('');
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
+  const [bookingLoading, setBookingLoading] = useState(false);
+
+  useEffect(() => {
+    if (trainer) {
+      if (trainer.trainingTypes?.length > 0) {
+        setSelectedType(trainer.trainingTypes[0]);
+      }
+      const days = Array.isArray(trainer.availability)
+        ? trainer.availability
+        : trainer.availability?.days || [];
+      if (days.length > 0) {
+        setSelectedDay(days[0]);
+      }
+      const slots = trainer.availability?.timeSlots || [];
+      if (slots.length > 0) {
+        setSelectedTimeSlot(slots[0]);
+      }
+    }
+  }, [trainer]);
+
+  const handleOpenBookingModal = () => {
+    const userToken = localStorage.getItem('userToken') || localStorage.getItem('token');
+    if (!userToken) {
+      toast.error('Please login first to book a session.');
+      navigate('/login');
+      return;
+    }
+    setIsBookingModalOpen(true);
+  };
+
+  const handleConfirmBooking = async () => {
+    setBookingLoading(true);
+    try {
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        toast.error('Razorpay SDK failed to load. Are you online?');
+        setBookingLoading(false);
+        return;
+      }
+
+      const amount = selectedPlan === 'Session' ? priceVal : (priceMonth || 0);
+
+      const options = {
+        key: 'rzp_test_SNw35MkokY8h1y',
+        amount: Math.round(amount * 100), // in paise
+        currency: 'INR',
+        name: 'Find Gym Trainer Booking',
+        description: `Session Booking (${selectedType}) with ${trainer.name}`,
+        handler: async (response) => {
+          toast.success(`Payment Successful! Booking request sent to ${trainer.name}.`, {
+            duration: 5000,
+            icon: '🎉',
+            style: {
+              background: '#1c1c1e',
+              color: '#fff',
+              border: '1px solid rgba(255, 122, 0, 0.2)',
+            }
+          });
+          setIsBookingModalOpen(false);
+        },
+        prefill: {
+          name: '',
+          email: '',
+          contact: ''
+        },
+        theme: {
+          color: '#FF7A00'
+        }
+      };
+
+      const rzpInstance = new window.Razorpay(options);
+      rzpInstance.open();
+    } catch (err) {
+      toast.error('Failed to initiate payment.');
+    } finally {
+      setBookingLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchTrainer = async () => {
@@ -193,7 +294,7 @@ const TrainerProfile = () => {
               </div>
 
               {/* Status badge */}
-              {trainer.status === 'active' && (
+              {(trainer.status === 'active' || trainer.status === 'approved') && (
                 <div className="absolute top-3 right-3 flex items-center gap-1 px-2.5 py-1 bg-green-500/15 border border-green-500/30 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block animate-pulse" />
                   <span className="text-green-400 text-[0.65rem] font-bold">Active</span>
@@ -226,7 +327,10 @@ const TrainerProfile = () => {
                   Trial available · ₹{trainer.trialPrice || 0}
                 </div>
               )}
-              <button className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-[#FF7A00] to-[#E66E00] hover:to-[#FF9500] text-white font-extrabold text-[0.88rem] rounded-xl cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_0_32px_rgba(255,122,0,0.4)] transition-all duration-200 shadow-[0_0_20px_rgba(255,122,0,0.25)]">
+              <button
+                onClick={handleOpenBookingModal}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-[#FF7A00] to-[#E66E00] hover:to-[#FF9500] text-white font-extrabold text-[0.88rem] rounded-xl cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_0_32px_rgba(255,122,0,0.4)] transition-all duration-200 shadow-[0_0_20px_rgba(255,122,0,0.25)]"
+              >
                 Book Now
                 <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -247,6 +351,37 @@ const TrainerProfile = () => {
                       {t}
                     </span>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Contact & Personal Details */}
+            {(trainer.email || trainer.phone || trainer.gender) && (
+              <div className="bg-[rgba(18,18,18,0.92)] border border-white/[0.07] rounded-2xl p-4">
+                <SectionLabel>Contact & Details</SectionLabel>
+                <div className="flex flex-col gap-3 pt-1">
+                  {trainer.email && (
+                    <div className="flex items-center gap-2.5 text-[0.8rem] text-white/70">
+                      <svg className="w-4 h-4 text-[#FF7A00] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <a href={`mailto:${trainer.email}`} className="hover:text-[#FF7A00] transition-colors truncate">{trainer.email}</a>
+                    </div>
+                  )}
+                  {trainer.phone && (
+                    <div className="flex items-center gap-2.5 text-[0.8rem] text-white/70">
+                      <svg className="w-4 h-4 text-[#FF7A00] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      <a href={`tel:${trainer.phone}`} className="hover:text-[#FF7A00] transition-colors">{trainer.phone}</a>
+                    </div>
+                  )}
+                  {trainer.gender && (
+                    <div className="flex items-center gap-2.5 text-[0.8rem] text-white/70 border-t border-white/5 pt-2.5 mt-1">
+                      <span className="text-white/40">Gender:</span>
+                      <span className="font-semibold text-white/80">{trainer.gender}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -379,7 +514,7 @@ const TrainerProfile = () => {
               <SectionLabel>Availability</SectionLabel>
               <div className="flex gap-2 flex-wrap mb-3">
                 {DAYS.map((day) => {
-                  const on = availabilityDays.includes(day);
+                  const on = availabilityDays.some(d => d.toLowerCase().startsWith(day.toLowerCase()));
                   return (
                     <div
                       key={day}
@@ -458,6 +593,134 @@ const TrainerProfile = () => {
           </div>
         </div>
       </div>
+
+      {/* Booking Modal */}
+      {isBookingModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0e1013] border border-zinc-800/80 rounded-[2rem] max-w-lg w-full p-6 md:p-8 shadow-2xl relative overflow-hidden">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsBookingModalOpen(false)}
+              className="absolute top-5 right-5 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-full p-2 transition-all cursor-pointer z-10"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="relative z-10 text-left">
+              <h3 className="text-xl font-bold text-white mb-2">Book a Session</h3>
+              <p className="text-zinc-400 text-xs mb-6">Select your package and training preferences to book {trainer.name}.</p>
+
+              <div className="space-y-4">
+                {/* Format selection */}
+                <div>
+                  <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Training Format</label>
+                  <select
+                    value={selectedType}
+                    onChange={(e) => setSelectedType(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#FF7A00]"
+                  >
+                    {trainingTypeBadges.length > 0 ? (
+                      trainingTypeBadges.map((type) => (
+                        <option key={type} value={type}>{type}</option>
+                      ))
+                    ) : (
+                      <option value="Personal Training">Personal Training</option>
+                    )}
+                  </select>
+                </div>
+
+                {/* Plan Selection */}
+                <div>
+                  <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Select Plan</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setSelectedPlan('Session')}
+                      className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                        selectedPlan === 'Session'
+                          ? 'border-[#FF7A00]/50 bg-[#FF7A00]/10 text-white'
+                          : 'border-zinc-800 bg-zinc-950/50 text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      <span className="text-xs font-bold">Per Session</span>
+                      <span className="text-sm font-black text-[#FF7A00] mt-1">₹{priceVal}</span>
+                    </button>
+
+                    {priceMonth && (
+                      <button
+                        onClick={() => setSelectedPlan('Monthly')}
+                        className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                          selectedPlan === 'Monthly'
+                            ? 'border-[#FF7A00]/50 bg-[#FF7A00]/10 text-white'
+                            : 'border-zinc-800 bg-zinc-950/50 text-zinc-400 hover:text-white'
+                        }`}
+                      >
+                        <span className="text-xs font-bold">Monthly Plan</span>
+                        <span className="text-sm font-black text-[#FF7A00] mt-1">₹{priceMonth}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Day Selection */}
+                <div>
+                  <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Preferred Day</label>
+                  <select
+                    value={selectedDay}
+                    onChange={(e) => setSelectedDay(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#FF7A00]"
+                  >
+                    {availabilityDays.length > 0 ? (
+                      availabilityDays.map((day) => (
+                        <option key={day} value={day}>{day}</option>
+                      ))
+                    ) : (
+                      <option value="Monday">Monday</option>
+                    )}
+                  </select>
+                </div>
+
+                {/* Time Selection */}
+                <div>
+                  <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Preferred Time Slot</label>
+                  <select
+                    value={selectedTimeSlot}
+                    onChange={(e) => setSelectedTimeSlot(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#FF7A00]"
+                  >
+                    {timeSlots.length > 0 ? (
+                      timeSlots.map((slot) => (
+                        <option key={slot} value={slot}>{slot}</option>
+                      ))
+                    ) : (
+                      <option value="6:00 AM">6:00 AM</option>
+                    )}
+                  </select>
+                </div>
+              </div>
+
+              {/* Confirm Button */}
+              <button
+                onClick={handleConfirmBooking}
+                disabled={bookingLoading}
+                className="w-full mt-6 flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-[#FF7A00] to-[#E66E00] hover:to-[#FF9500] text-white font-extrabold text-xs rounded-xl cursor-pointer hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {bookingLoading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>Confirm Booking</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

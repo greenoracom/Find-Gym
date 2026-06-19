@@ -36,7 +36,7 @@ export const VerticalNavbar = () => {
       ),
     },
     {
-      name: "Categories",
+      name: "Health Store",
       path: "/categories",
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,7 +206,7 @@ export const MobileBottomNav = () => {
       ),
     },
     {
-      name: "Categories",
+      name: "Health Store",
       path: "/categories",
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

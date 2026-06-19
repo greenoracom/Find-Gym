@@ -189,6 +189,228 @@ const sendOTPEmail = async (email, otp) => {
   }
 };
 
+// ─── HEALTH STORE EMAILS ──────────────────────────────────────────────────────
+
+const sendHealthStoreInviteEmail = async (email, ownerName, storeName, inviteLink) => {
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `Find Gym <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'You are Invited to Register Your Health Store on Find Gym',
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#fff;border-radius:12px;overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#FF4444,#cc0000);padding:30px;text-align:center;">
+            <h1 style="margin:0;font-size:28px;font-weight:900;">FIND <span style="color:#fff;">GYM</span></h1>
+            <p style="margin:8px 0 0;opacity:0.85;font-size:14px;">Health Store Partner Invitation</p>
+          </div>
+          <div style="padding:32px;">
+            <p style="font-size:16px;">Hello <strong>${ownerName}</strong>,</p>
+            <p style="color:#ccc;line-height:1.7;">You have been invited to register <strong style="color:#FF4444;">${storeName}</strong> as a Health Store Partner on Find Gym. Click the button below to complete your registration.</p>
+            <div style="text-align:center;margin:32px 0;">
+              <a href="${inviteLink}" style="display:inline-block;background:linear-gradient(135deg,#FF4444,#cc0000);color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:700;font-size:16px;">Register Now</a>
+            </div>
+            <p style="color:#666;font-size:13px;">This link will expire in 48 hours. If you did not expect this email, please ignore it.</p>
+            <hr style="border:1px solid #222;margin:24px 0;" />
+            <p style="color:#666;font-size:12px;text-align:center;">© Find Gym | support@findgym.com</p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.error('Health Store invite email failed:', err);
+    return false;
+  }
+};
+
+const sendRegistrationSubmittedEmail = async (email, ownerName, storeName) => {
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `Find Gym <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Health Store Registration Submitted — Find Gym',
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#fff;border-radius:12px;overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#FF4444,#cc0000);padding:30px;text-align:center;">
+            <h1 style="margin:0;font-size:28px;font-weight:900;">FIND GYM</h1>
+          </div>
+          <div style="padding:32px;">
+            <p>Hello <strong>${ownerName}</strong>,</p>
+            <p style="color:#ccc;line-height:1.7;">Your registration for <strong style="color:#FF4444;">${storeName}</strong> has been submitted successfully and is currently <strong>Pending Verification</strong> by our City Admin.</p>
+            <p style="color:#ccc;">You will receive an email once the verification is complete. This usually takes 24–48 hours.</p>
+            <hr style="border:1px solid #222;margin:24px 0;" />
+            <p style="color:#666;font-size:12px;text-align:center;">© Find Gym</p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.error('Registration submitted email failed:', err);
+    return false;
+  }
+};
+
+const sendHealthStoreApprovedEmail = async (email, ownerName, storeName, setPasswordLink) => {
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `Find Gym <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: '🎉 Your Health Store is Approved — Set Your Password',
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#fff;border-radius:12px;overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#FF4444,#cc0000);padding:30px;text-align:center;">
+            <h1 style="margin:0;font-size:28px;font-weight:900;">FIND GYM</h1>
+            <p style="margin:8px 0 0;opacity:0.85;">Congratulations! 🎉</p>
+          </div>
+          <div style="padding:32px;">
+            <p>Hello <strong>${ownerName}</strong>,</p>
+            <p style="color:#ccc;line-height:1.7;">Your Health Store <strong style="color:#FF4444;">${storeName}</strong> has been <strong>Approved</strong>! Click the button below to set your password and access your Health Store Panel.</p>
+            <div style="text-align:center;margin:32px 0;">
+              <a href="${setPasswordLink}" style="display:inline-block;background:linear-gradient(135deg,#FF4444,#cc0000);color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:700;font-size:16px;">Set Your Password</a>
+            </div>
+            <p style="color:#666;font-size:13px;">This link will expire in 24 hours.</p>
+            <hr style="border:1px solid #222;margin:24px 0;" />
+            <p style="color:#666;font-size:12px;text-align:center;">© Find Gym</p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.error('Health Store approved email failed:', err);
+    return false;
+  }
+};
+
+const sendHealthStoreRejectedEmail = async (email, ownerName, storeName, reason) => {
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `Find Gym <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Health Store Registration Update — Find Gym',
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#fff;border-radius:12px;overflow:hidden;">
+          <div style="background:#333;padding:30px;text-align:center;">
+            <h1 style="margin:0;font-size:28px;font-weight:900;">FIND GYM</h1>
+          </div>
+          <div style="padding:32px;">
+            <p>Hello <strong>${ownerName}</strong>,</p>
+            <p style="color:#ccc;line-height:1.7;">Unfortunately, your registration for <strong>${storeName}</strong> has been <strong style="color:#FF4444;">Rejected</strong>.</p>
+            <div style="background:#1a1a1a;border-left:4px solid #FF4444;padding:16px;border-radius:4px;margin:20px 0;">
+              <p style="margin:0;color:#ccc;"><strong>Reason:</strong> ${reason}</p>
+            </div>
+            <p style="color:#ccc;">For any queries, contact us at support@findgym.com</p>
+            <hr style="border:1px solid #222;margin:24px 0;" />
+            <p style="color:#666;font-size:12px;text-align:center;">© Find Gym</p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.error('Health Store rejected email failed:', err);
+    return false;
+  }
+};
+
+const sendChangesRequestedEmail = async (email, ownerName, storeName, reason) => {
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `Find Gym <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Changes Required for Your Health Store Registration — Find Gym',
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#fff;border-radius:12px;overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#e6a817,#c4860f);padding:30px;text-align:center;">
+            <h1 style="margin:0;font-size:28px;font-weight:900;">FIND GYM</h1>
+          </div>
+          <div style="padding:32px;">
+            <p>Hello <strong>${ownerName}</strong>,</p>
+            <p style="color:#ccc;line-height:1.7;">Some changes are required for your Health Store <strong>${storeName}</strong> registration before it can be approved.</p>
+            <div style="background:#1a1a1a;border-left:4px solid #e6a817;padding:16px;border-radius:4px;margin:20px 0;">
+              <p style="margin:0;color:#ccc;"><strong>Changes Needed:</strong> ${reason}</p>
+            </div>
+            <p style="color:#ccc;">Please update your registration and resubmit. Contact support@findgym.com for help.</p>
+            <hr style="border:1px solid #222;margin:24px 0;" />
+            <p style="color:#666;font-size:12px;text-align:center;">© Find Gym</p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.error('Changes requested email failed:', err);
+    return false;
+  }
+};
+
+const sendProductApprovedEmail = async (email, ownerName, productName, storeName) => {
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `Find Gym <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: `✅ Product Approved and Live — ${productName}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#fff;border-radius:12px;overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#22c55e,#16a34a);padding:30px;text-align:center;">
+            <h1 style="margin:0;font-size:28px;font-weight:900;color:#fff;">FIND GYM</h1>
+          </div>
+          <div style="padding:32px;">
+            <p>Hello <strong>${ownerName}</strong>,</p>
+            <p style="color:#ccc;line-height:1.7;">Great news! Your product <strong style="color:#22c55e;">${productName}</strong> from <strong>${storeName}</strong> has been <strong>Approved</strong> and is now <strong>Live</strong> on the Find Gym Health Store.</p>
+            <p style="color:#ccc;">Customers can now discover and purchase your product.</p>
+            <hr style="border:1px solid #222;margin:24px 0;" />
+            <p style="color:#666;font-size:12px;text-align:center;">© Find Gym</p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.error('Product approved email failed:', err);
+    return false;
+  }
+};
+
+const sendProductRejectedEmail = async (email, ownerName, productName, reason) => {
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `Find Gym <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: `Product Update Required — ${productName}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#fff;border-radius:12px;overflow:hidden;">
+          <div style="background:#333;padding:30px;text-align:center;">
+            <h1 style="margin:0;font-size:28px;font-weight:900;">FIND GYM</h1>
+          </div>
+          <div style="padding:32px;">
+            <p>Hello <strong>${ownerName}</strong>,</p>
+            <p style="color:#ccc;line-height:1.7;">Your product <strong>${productName}</strong> has been <strong style="color:#FF4444;">Rejected</strong>.</p>
+            <div style="background:#1a1a1a;border-left:4px solid #FF4444;padding:16px;border-radius:4px;margin:20px 0;">
+              <p style="margin:0;color:#ccc;"><strong>Reason:</strong> ${reason}</p>
+            </div>
+            <p style="color:#ccc;">Please update your product and resubmit for approval.</p>
+            <hr style="border:1px solid #222;margin:24px 0;" />
+            <p style="color:#666;font-size:12px;text-align:center;">© Find Gym</p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.error('Product rejected email failed:', err);
+    return false;
+  }
+};
+
 module.exports = {
   sendRegistrationEmail,
   sendGymAddedEmail,
@@ -199,5 +421,13 @@ module.exports = {
   sendTrainerActiveEmail,
   sendTrainerBlockEmail,
   sendTrainerAdminNotification,
-  sendOTPEmail
+  sendOTPEmail,
+  // Health Store Emails
+  sendHealthStoreInviteEmail,
+  sendRegistrationSubmittedEmail,
+  sendHealthStoreApprovedEmail,
+  sendHealthStoreRejectedEmail,
+  sendChangesRequestedEmail,
+  sendProductApprovedEmail,
+  sendProductRejectedEmail,
 };

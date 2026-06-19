@@ -13,6 +13,10 @@ const CityAdminDashboard = () => {
     if (path.includes('/gym-owners')) return 'Gym Owner Requests';
     if (path.includes('/trainers')) return 'Trainers Management';
     if (path.includes('/dietitians')) return 'Dietitians Management';
+    if (path.includes('/health-stores/approvals')) return 'Product Approvals';
+    if (path.includes('/health-stores/add')) return 'Invite Health Store';
+    if (/\/(health-stores)\/[a-f0-9]{24}$/i.test(path)) return 'Health Store Details';
+    if (path.includes('/health-stores')) return 'Health Stores';
     if (path.includes('/analytics')) return 'Analytics Overview';
     if (path.includes('/activity-logs')) return 'Activity Logs';
     if (path.includes('/settings')) return 'Account Settings';

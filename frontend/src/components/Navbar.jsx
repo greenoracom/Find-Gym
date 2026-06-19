@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [registerDropdownOpen, setRegisterDropdownOpen] = useState(false);
 
   React.useEffect(() => {
     const handleToggle = () => setIsOpen((prev) => !prev);
@@ -13,6 +14,16 @@ const Navbar = () => {
       window.removeEventListener("toggle-sidebar", handleToggle);
       window.removeEventListener("close-sidebar", handleClose);
     };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".register-dropdown-container")) {
+        setRegisterDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleHamburgerClick = () => {
@@ -99,51 +110,66 @@ const Navbar = () => {
               </button>
 
 
-              <Link
-                to="/gym-owner/login"
-                className="
-                  text-zinc-300
-                  hover:text-[#FF7A00]
-                  font-semibold
-                  text-sm
-                  transition-all
-                  mr-2
-                "
-              >
-                Owner Portal
-              </Link>
+              <div className="relative register-dropdown-container">
+                <button
+                  onClick={() => setRegisterDropdownOpen(!registerDropdownOpen)}
+                  className="
+                    px-6
+                    py-2.5
+                    rounded-full
+                    bg-[#FF7A00]
+                    hover:bg-[#E66E00]
+                    text-white
+                    font-medium
+                    shadow-lg
+                    hover:scale-105
+                    transition-all
+                    cursor-pointer
+                    flex
+                    items-center
+                    gap-1.5
+                  "
+                >
+                  <span>Register</span>
+                  <svg
+                    className={`w-4 h-4 transition-transform duration-200 ${registerDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
-              <Link
-                to="/trainer/register"
-                className="
-                  text-zinc-300
-                  hover:text-[#a3ff12]
-                  font-semibold
-                  text-sm
-                  transition-all
-                  mr-2
-                "
-              >
-                Register as Trainer
-              </Link>
-
-              <Link
-                to="/register"
-                className="
-                  px-6
-                  py-2.5
-                  rounded-full
-                  bg-[#FF7A00]
-                  hover:bg-[#E66E00]
-                  text-white
-                  font-medium
-                  shadow-lg
-                  hover:scale-105
-                  transition-all
-                "
-              >
-                Register
-              </Link>
+                {registerDropdownOpen && (
+                  <div className="absolute right-0 mt-2.5 w-60 rounded-2xl bg-black/95 border border-zinc-800/80 backdrop-blur-xl shadow-2xl p-2.5 z-50 flex flex-col gap-1.5 animate-fadeIn">
+                    <Link
+                      to="/gym-owner/login"
+                      onClick={() => setRegisterDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 text-zinc-300 hover:text-[#FF7A00] hover:bg-white/[0.05] rounded-xl transition-all font-semibold text-xs text-left"
+                    >
+                      <span className="text-base">🏋️</span>
+                      <span>Owner Login / Register</span>
+                    </Link>
+                    <Link
+                      to="/trainer/register"
+                      onClick={() => setRegisterDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 text-zinc-300 hover:text-[#a3ff12] hover:bg-white/[0.05] rounded-xl transition-all font-semibold text-xs text-left"
+                    >
+                      <span className="text-base">👥</span>
+                      <span>Register as Trainer</span>
+                    </Link>
+                    <Link
+                      to="/register"
+                      onClick={() => setRegisterDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 text-zinc-300 hover:text-[#FF7A00] hover:bg-white/[0.05] rounded-xl transition-all font-semibold text-xs text-left border-t border-zinc-800/60"
+                    >
+                      <span className="text-base">👤</span>
+                      <span>Normal Register</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Mobile Menu Hamburger Button */}
