@@ -39,7 +39,7 @@ const HealthStoreLogin = () => {
             <span className="text-3xl">🏪</span>
           </div>
           <h2 className="text-3xl font-extrabold text-white tracking-tight leading-tight">
-            Find Gym <span className="text-red-500">Store Panel</span>
+            LifeCell.Fitness <span className="text-red-500">Store Panel</span>
           </h2>
           <p className="mt-2 text-sm text-gray-400">
             Sign in to manage your diet plans and supplements

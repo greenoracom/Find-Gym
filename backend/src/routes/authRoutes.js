@@ -8,9 +8,7 @@ const User = require('../models/User');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const { sendRegistrationEmail, sendAdminNotification, sendOTPEmail } = require('../utils/email');
 const { protectUser } = require('../middleware/authMiddleware');
-
-// In-memory OTP storage
-const otps = {};
+const { otps, verifiedEmails } = require('../utils/otpStore');
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -395,6 +393,7 @@ router.post('/verify-otp', async (req, res) => {
     }
 
     // OTP verified successfully
+    verifiedEmails[email.toLowerCase()] = { verified: true, expires: Date.now() + 15 * 60 * 1000 };
     delete otps[email.toLowerCase()];
     res.status(200).json({
       success: true,
@@ -462,6 +461,52 @@ router.put('/profile', protectUser, upload.single('profilePhoto'), async (req, r
   } catch (error) {
     console.error("Update profile error:", error);
     res.status(500).json({ success: false, message: "Failed to update profile", error: error.message, statusCode: 500 });
+  }
+});
+
+// POST /api/auth/trainer/:trainerId/review
+router.post('/trainer/:trainerId/review', protectUser, async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    const { trainerId } = req.params;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ success: false, message: "Rating must be between 1 and 5", statusCode: 400 });
+    }
+
+    const Trainer = require('../models/Trainer');
+    const trainer = await Trainer.findById(trainerId);
+    if (!trainer) {
+      return res.status(404).json({ success: false, message: "Trainer not found", statusCode: 404 });
+    }
+
+    // Recalculate average star rating
+    const currentAverage = trainer.rating?.average || 0;
+    const currentCount = trainer.rating?.count || 0;
+
+    const newCount = currentCount + 1;
+    const newAverage = Math.round(((currentAverage * currentCount + Number(rating)) / newCount) * 10) / 10;
+
+    trainer.rating = {
+      average: newAverage,
+      count: newCount
+    };
+
+    if (comment) {
+      trainer.review = comment;
+    }
+
+    await trainer.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Review submitted successfully!",
+      rating: trainer.rating,
+      statusCode: 200
+    });
+  } catch (error) {
+    console.error("Submit review error:", error);
+    res.status(500).json({ success: false, message: "Failed to submit review", error: error.message, statusCode: 500 });
   }
 });
 

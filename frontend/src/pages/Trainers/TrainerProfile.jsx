@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getPublicTrainerById } from '../../userServices/trainerApi';
+import { getPublicTrainerById, initiateBooking, verifyBookingPayment } from '../../userServices/trainerApi';
 import toast from 'react-hot-toast';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -71,25 +71,76 @@ const TrainerProfile = () => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [selectedType, setSelectedType] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('Session'); // 'Session' or 'Monthly'
-  const [selectedDay, setSelectedDay] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
+  const [selectedAddress, setSelectedAddress] = useState('');
+  const [selectedPhone, setSelectedPhone] = useState(() => localStorage.getItem('userPhone') || '');
+  const [isFetchingLocation, setIsFetchingLocation] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
+
+  const getDayName = (dateStr) => {
+    if (!dateStr) return '';
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const localDate = new Date(year, month - 1, day);
+    return localDate.toLocaleDateString('en-US', { weekday: 'long' });
+  };
+
+  const getFirstAvailableDate = (trainerObj) => {
+    const allowedDays = Array.isArray(trainerObj?.availability)
+      ? trainerObj.availability
+      : trainerObj?.availability?.days || [];
+    
+    if (allowedDays.length === 0) {
+      return new Date().toISOString().split('T')[0];
+    }
+    
+    const today = new Date();
+    // Look up to 30 days ahead to find matching availability day
+    for (let i = 0; i < 30; i++) {
+      const checkDate = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
+      const y = checkDate.getFullYear();
+      const m = String(checkDate.getMonth() + 1).padStart(2, '0');
+      const d = String(checkDate.getDate()).padStart(2, '0');
+      const dateStr = `${y}-${m}-${d}`;
+      const dayName = checkDate.toLocaleDateString('en-US', { weekday: 'long' });
+      if (allowedDays.some(ad => ad.toLowerCase() === dayName.toLowerCase())) {
+        return dateStr;
+      }
+    }
+    return new Date().toISOString().split('T')[0];
+  };
+
+  const handleDateChange = (dateStr) => {
+    if (!dateStr) {
+      setSelectedDate('');
+      return;
+    }
+
+    const dayName = getDayName(dateStr);
+    const allowedDays = Array.isArray(trainer?.availability)
+      ? trainer.availability
+      : trainer?.availability?.days || [];
+
+    if (allowedDays.length > 0) {
+      const isAvailable = allowedDays.some(d => d.toLowerCase() === dayName.toLowerCase());
+      if (!isAvailable) {
+        toast.error(`${trainer.name} is only available on: ${allowedDays.join(', ')}`);
+        return;
+      }
+    }
+    setSelectedDate(dateStr);
+  };
 
   useEffect(() => {
     if (trainer) {
       if (trainer.trainingTypes?.length > 0) {
         setSelectedType(trainer.trainingTypes[0]);
       }
-      const days = Array.isArray(trainer.availability)
-        ? trainer.availability
-        : trainer.availability?.days || [];
-      if (days.length > 0) {
-        setSelectedDay(days[0]);
-      }
       const slots = trainer.availability?.timeSlots || [];
       if (slots.length > 0) {
         setSelectedTimeSlot(slots[0]);
       }
+      setSelectedDate(getFirstAvailableDate(trainer));
     }
   }, [trainer]);
 
@@ -103,9 +154,64 @@ const TrainerProfile = () => {
     setIsBookingModalOpen(true);
   };
 
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      return;
+    }
+    setIsFetchingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await res.json();
+          if (data && data.display_name) {
+            setSelectedAddress(data.display_name);
+            toast.success('Location fetched successfully!');
+          } else {
+            setSelectedAddress(`${latitude}, ${longitude}`);
+            toast.success('Coordinates fetched!');
+          }
+        } catch (err) {
+          setSelectedAddress(`${latitude}, ${longitude}`);
+          toast.success('Coordinates fetched!');
+        } finally {
+          setIsFetchingLocation(false);
+        }
+      },
+      (error) => {
+        toast.error('Failed to get location. Please type manually.');
+        setIsFetchingLocation(false);
+      }
+    );
+  };
+
   const handleConfirmBooking = async () => {
     setBookingLoading(true);
     try {
+      if (!selectedDate) {
+        toast.error('Please select a date.');
+        setBookingLoading(false);
+        return;
+      }
+      if ((selectedType === 'Personal Training' || selectedType === 'Group Training') && !selectedAddress.trim()) {
+        toast.error('Please enter a training address.');
+        setBookingLoading(false);
+        return;
+      }
+      if (!selectedPhone.trim()) {
+        toast.error('Please enter your contact phone number.');
+        setBookingLoading(false);
+        return;
+      }
+      if (selectedPhone.trim().length !== 10) {
+        toast.error('Please enter a valid 10-digit phone number.');
+        setBookingLoading(false);
+        return;
+      }
+      localStorage.setItem('userPhone', selectedPhone);
+
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
         toast.error('Razorpay SDK failed to load. Are you online?');
@@ -114,24 +220,62 @@ const TrainerProfile = () => {
       }
 
       const amount = selectedPlan === 'Session' ? priceVal : (priceMonth || 0);
+      const dayName = getDayName(selectedDate);
+
+      // Lock slot on backend & create Razorpay Order
+      const bookingRes = await initiateBooking({
+        trainerId,
+        slot: selectedTimeSlot,
+        day: dayName,
+        date: selectedDate,
+        price: amount,
+        plan: selectedPlan,
+        trainingType: selectedType,
+        address: (selectedType === 'Personal Training' || selectedType === 'Group Training') ? selectedAddress : undefined,
+        phone: selectedPhone
+      });
+
+      if (!bookingRes.success) {
+        toast.error(bookingRes.message || 'Failed to lock slot');
+        setBookingLoading(false);
+        return;
+      }
 
       const options = {
-        key: 'rzp_test_SNw35MkokY8h1y',
-        amount: Math.round(amount * 100), // in paise
-        currency: 'INR',
-        name: 'Find Gym Trainer Booking',
+        key: bookingRes.key,
+        amount: bookingRes.amount,
+        currency: bookingRes.currency,
+        name: 'LifeCell.Fitness Trainer Booking',
         description: `Session Booking (${selectedType}) with ${trainer.name}`,
+        order_id: bookingRes.orderId, // Crucial: Razorpay Order ID from backend!
         handler: async (response) => {
-          toast.success(`Payment Successful! Booking request sent to ${trainer.name}.`, {
-            duration: 5000,
-            icon: '🎉',
-            style: {
-              background: '#1c1c1e',
-              color: '#fff',
-              border: '1px solid rgba(255, 122, 0, 0.2)',
-            }
-          });
-          setIsBookingModalOpen(false);
+          try {
+            // Manually verify payment signature for instant confirmation (vital for local/dev envs)
+            await verifyBookingPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            });
+
+            toast.success(`Payment Successful! Booking request confirmed.`, {
+              duration: 5000,
+              icon: '🎉',
+              style: {
+                background: '#1c1c1e',
+                color: '#fff',
+                border: '1px solid rgba(255, 122, 0, 0.2)',
+              }
+            });
+          } catch (err) {
+            console.error("Verification error:", err);
+            toast.error("Payment complete! We are updating your status now.");
+          } finally {
+            setIsBookingModalOpen(false);
+            // Wait 2 seconds and reload to show updated status
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          }
         },
         prefill: {
           name: '',
@@ -146,7 +290,7 @@ const TrainerProfile = () => {
       const rzpInstance = new window.Razorpay(options);
       rzpInstance.open();
     } catch (err) {
-      toast.error('Failed to initiate payment.');
+      toast.error(err?.response?.data?.message || 'Failed to initiate payment.');
     } finally {
       setBookingLoading(false);
     }
@@ -432,7 +576,7 @@ const TrainerProfile = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   ),
-                  val: `${trainer.totalBookings || 0}+`,
+                  val: trainer.clients || `${trainer.totalBookings || 0}+`,
                   label: 'Trained',
                 },
                 {
@@ -474,6 +618,18 @@ const TrainerProfile = () => {
               <SectionLabel>About Me</SectionLabel>
               <p className="text-[0.87rem] text-white/60 leading-[1.8]">{bioText}</p>
             </div>
+
+            {/* Featured Review */}
+            {trainer.review && (
+              <div className="bg-[rgba(18,18,18,0.92)] border border-white/[0.07] rounded-2xl p-5">
+                <SectionLabel>Featured Review</SectionLabel>
+                <div className="bg-[#FF7A00]/05 border border-[#FF7A00]/20 rounded-xl p-4 italic text-white/80 text-[0.85rem] relative">
+                  <span className="text-3xl text-[#FF7A00]/30 absolute top-1 left-2 font-serif">“</span>
+                  <p className="pl-6 pr-4">{trainer.review}</p>
+                  <span className="text-3xl text-[#FF7A00]/30 absolute bottom-1 right-2 font-serif">”</span>
+                </div>
+              </div>
+            )}
 
             {/* Specializations */}
             <div className="bg-[rgba(18,18,18,0.92)] border border-white/[0.07] rounded-2xl p-5">
@@ -631,6 +787,54 @@ const TrainerProfile = () => {
                   </select>
                 </div>
 
+                {/* Address Selection (For In-Person Formats) */}
+                {(selectedType === 'Personal Training' || selectedType === 'Group Training') && (
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                      Training Address / Location <span className="text-[#FF7A00] text-[9px] font-normal lowercase">(required for in-person training)</span>
+                    </label>
+                    <div className="relative flex items-center">
+                      <input
+                        type="text"
+                        placeholder="Enter your training address manually..."
+                        value={selectedAddress}
+                        onChange={(e) => setSelectedAddress(e.target.value)}
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-4 pr-12 py-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-[#FF7A00]"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleGetCurrentLocation}
+                        disabled={isFetchingLocation}
+                        className="absolute right-3 text-[#FF7A00] hover:text-[#E66E00] disabled:opacity-50 transition-all cursor-pointer p-1"
+                        title="Use Current Location"
+                      >
+                        {isFetchingLocation ? (
+                          <div className="w-4 h-4 border-2 border-[#FF7A00] border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Contact Phone Number */}
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                    Contact Phone Number <span className="text-[#FF7A00] text-[9px] font-normal lowercase">(required for coordinator/trainer contact)</span>
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="Enter your 10-digit mobile number..."
+                    value={selectedPhone}
+                    onChange={(e) => setSelectedPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-[#FF7A00]"
+                  />
+                </div>
+
                 {/* Plan Selection */}
                 <div>
                   <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Select Plan</label>
@@ -663,22 +867,25 @@ const TrainerProfile = () => {
                   </div>
                 </div>
 
-                {/* Day Selection */}
+                {/* Date Selection */}
                 <div>
-                  <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Preferred Day</label>
-                  <select
-                    value={selectedDay}
-                    onChange={(e) => setSelectedDay(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#FF7A00]"
-                  >
-                    {availabilityDays.length > 0 ? (
-                      availabilityDays.map((day) => (
-                        <option key={day} value={day}>{day}</option>
-                      ))
-                    ) : (
-                      <option value="Monday">Monday</option>
+                  <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">
+                    Preferred Date {selectedDate && (
+                      <span className="text-[#FF7A00] ml-2 font-black">({getDayName(selectedDate)})</span>
                     )}
-                  </select>
+                  </label>
+                  <input
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    value={selectedDate}
+                    onChange={(e) => handleDateChange(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#FF7A00] [color-scheme:dark]"
+                  />
+                  {availabilityDays.length > 0 && (
+                    <span className="block text-[10px] text-zinc-500 mt-1.5">
+                      Available days: <strong className="text-zinc-300">{availabilityDays.join(', ')}</strong>
+                    </span>
+                  )}
                 </div>
 
                 {/* Time Selection */}

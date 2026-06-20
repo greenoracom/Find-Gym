@@ -17,6 +17,7 @@ const trainerSchema = new mongoose.Schema({
   certifications: [{ type: String }],
   bio: { type: String },
   languages: [{ type: String }],
+  review: { type: String },
 
   // Service Info
   trainingTypes: [{ type: String }],
@@ -62,6 +63,11 @@ const trainerSchema = new mongoose.Schema({
   reapplyCount: { type: Number, default: 0 },
   blockedReason: { type: String },
 
+  approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+  approvedAt: { type: Date },
+  rejectedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+  rejectedAt: { type: Date },
+
   verifiedBy: {
     adminId: mongoose.Schema.Types.ObjectId,
     adminRole: String,
@@ -72,6 +78,7 @@ const trainerSchema = new mongoose.Schema({
   // Stats
   totalBookings: { type: Number, default: 0 },
   totalEarnings: { type: Number, default: 0 },
+  clients: { type: String, default: "0" },
   rating: {
     average: { type: Number, default: 0 },
     count: { type: Number, default: 0 }

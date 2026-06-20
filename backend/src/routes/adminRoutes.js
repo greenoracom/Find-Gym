@@ -11,6 +11,7 @@ router.post('/login', adminController.login);
 // Protected Routes (Should be protected in production)
 router.post('/create', adminController.createAdmin);
 router.get('/all', adminController.getAdmins);
+router.get('/city-admins', adminController.getCityAdmins);
 router.patch('/:adminId', adminController.updateAdmin);
 router.delete('/:adminId', adminController.deleteAdmin);
 

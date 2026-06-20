@@ -182,8 +182,8 @@ const Home = () => {
           <div className="relative z-10 flex flex-col items-center gap-4">
             {/* Spinning glowing loader representing mist/energy */}
             <div className="w-14 h-14 rounded-full border-2 border-t-[#FF7A00] border-r-transparent border-b-[#FF7A00] border-l-transparent animate-spin mb-2 shadow-[0_0_25px_rgba(255,122,0,0.3)]"></div>
-            <h2 className="text-3xl font-black tracking-[0.25em] text-white">
-              FIND <span className="text-[#FF7A00]">GYM</span>
+            <h2 className="text-3xl font-black tracking-[0.2em] text-white">
+              LIFECELL<span className="text-[#FF7A00]">.FITNESS</span>
             </h2>
             <p className="text-gray-500 text-[10px] tracking-[0.35em] uppercase font-semibold">Experience Fitness</p>
           </div>
@@ -321,7 +321,7 @@ const Home = () => {
           {/* Full screen width marquee at the bottom of Hero */}
           <div className="absolute bottom-0 left-0 w-full bg-black/60 border-t border-white/10 backdrop-blur-md py-3 z-20">
             <marquee direction="left" scrollamount="12" className="text-sm font-semibold text-white tracking-widest uppercase">
-              MUMBAI • DELHI • BANGALORE • HYDERABAD • KOLKATA • AHMEDABAD ⚡ GET UP TO 30% OFF ON MEMBERSHIPS! ⚡ JOIN FIND GYM TODAY FOR FREE TRIALS! ⚡
+              MUMBAI • DELHI • BANGALORE • HYDERABAD • KOLKATA • AHMEDABAD ⚡ GET UP TO 30% OFF ON MEMBERSHIPS! ⚡ JOIN LIFECELL.FITNESS TODAY FOR FREE TRIALS! ⚡
             </marquee>
           </div>
         </div>
@@ -347,7 +347,7 @@ const Home = () => {
                 WHY CHOOSE US
               </div>
               <h2 className="text-[34px] md:text-5xl font-extrabold text-white tracking-tight mb-4 leading-tight text-center">
-                Why Choose <br className="block md:hidden" /> <span className="text-[#FF7A00]">Find Gym?</span>
+                Why Choose <br className="block md:hidden" /> <span className="text-[#FF7A00]">LifeCell.Fitness?</span>
               </h2>
               <p className="text-gray-400 text-sm md:text-lg font-light leading-relaxed max-w-xs md:max-w-3xl text-center">
                 We make your fitness journey smarter, easier and more effective<br className="hidden md:block" /> by bringing everything you need in one place.
@@ -879,7 +879,7 @@ const Home = () => {
               {/* Left Column: How It Works */}
               <div className="lg:w-[60%] bg-transparent md:bg-[#000000] border-0 md:border border-gray-800 rounded-3xl p-0 md:p-8 lg:p-10 flex flex-col justify-center">
                 <h2 className="text-3xl font-bold text-white mb-8 md:mb-12 text-center md:text-left">
-                  How <span className="text-[#FF7A00] drop-shadow-[0_0_10px_rgba(255,122,0,0.5)]">Find Gym</span> Works?
+                  How <span className="text-[#FF7A00] drop-shadow-[0_0_10px_rgba(255,122,0,0.5)]">LifeCell.Fitness</span> Works?
                 </h2>
 
                 <div className="flex flex-col md:flex-row justify-between items-stretch md:items-start gap-0 md:gap-4 relative">

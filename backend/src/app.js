@@ -18,6 +18,8 @@ const authRoutes = require('./routes/authRoutes');
 const gymRoutes = require('./routes/gymRoutes');
 const trainerAuthRoutes = require('./routes/trainerAuthRoutes');
 const trainerRoutes = require('./routes/trainerRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
+const membershipRoutes = require('./routes/membershipRoutes');
 
 // Health Store Routes
 const cityAdminHealthStoreRoutes = require('./routes/cityAdminHealthStoreRoutes');
@@ -55,7 +57,7 @@ const path = require('path');
 app.use('/cms', express.static(path.join(__dirname, '../uploads')));
 
 app.get("/", (req, res) => {
-  res.send("Find Gym API Running...");
+  res.send("LifeCell.Fitness API Running...");
 });
 
 // Super Admin Routes
@@ -74,6 +76,12 @@ app.use('/api/gyms', gymRoutes);
 // Trainer Routes
 app.use('/api/trainer/auth', trainerAuthRoutes);
 app.use('/api/trainer', trainerRoutes);
+
+// Booking Routes
+app.use('/api/bookings', bookingRoutes);
+
+// Membership Routes
+app.use('/api/memberships', membershipRoutes);
 
 // Health Store Routes
 app.use('/api/city-admin/health-stores', cityAdminHealthStoreRoutes);

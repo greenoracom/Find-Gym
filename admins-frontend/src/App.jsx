@@ -25,6 +25,7 @@ import PATransactionHistory from './admins/components/PlatformAdmin/Payments/Tra
 import PARevenueReports from './admins/components/PlatformAdmin/Payments/RevenueReports';
 import PAPayoutManagement from './admins/components/PlatformAdmin/Payments/PayoutManagement';
 import PAGymCategories from './admins/components/PlatformAdmin/CMS/GymCategories';
+import PACityAdminsList from './admins/components/PlatformAdmin/CityAdmins/CityAdminsList';
 
 // City Admin Imports
 import CityAdminDashboard from './pages/CityAdminDashboard';
@@ -86,6 +87,7 @@ function App() {
 
         <Route path="/platform-admin" element={<PlatformAdminDashboard />}>
           <Route path="dashboard" element={<PADashboard />} />
+          <Route path="city-admins" element={<PACityAdminsList />} />
           <Route path="users" element={<PAUsersList />} />
           <Route path="gyms" element={<PAGymsList />} />
           <Route path="gym-owners" element={<PAGymOwnersList />} />

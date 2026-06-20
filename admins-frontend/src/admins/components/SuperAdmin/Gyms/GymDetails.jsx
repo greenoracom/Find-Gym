@@ -21,8 +21,8 @@ const GymDetails = ({ isOpen, onClose, gym }) => {
             <div className="flex-1">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-1">{gym.name}</h2>
-                  <p className="text-gray-500 flex items-center gap-1 mb-2"><MapPin size={16} /> {gym.city}, India</p>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1">{gym.name || 'Gym'}</h2>
+                  <p className="text-gray-500 flex items-center gap-1 mb-2"><MapPin size={16} /> {gym.city || 'City'}, India</p>
                 </div>
                 <Badge label={gym.status} variant={gym.status === 'Approved' ? 'success' : gym.status === 'Pending' ? 'warning' : 'danger'} />
               </div>
@@ -32,10 +32,10 @@ const GymDetails = ({ isOpen, onClose, gym }) => {
                   <Phone size={16} className="text-gray-400" /> +91 9876543210
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Mail size={16} className="text-gray-400" /> contact@{gym.name.toLowerCase().replace(/ /g, '')}.com
+                  <Mail size={16} className="text-gray-400" /> contact@{typeof gym.name === 'string' ? gym.name.toLowerCase().replace(/ /g, '') : 'gym'}.com
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Globe size={16} className="text-gray-400" /> www.{gym.name.toLowerCase().replace(/ /g, '')}.com
+                  <Globe size={16} className="text-gray-400" /> www.{typeof gym.name === 'string' ? gym.name.toLowerCase().replace(/ /g, '') : 'gym'}.com
                 </div>
               </div>
             </div>
@@ -66,10 +66,10 @@ const GymDetails = ({ isOpen, onClose, gym }) => {
             <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Owner Info</h3>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
-                {gym.owner.charAt(0)}
+                {gym.owner && typeof gym.owner === 'string' ? gym.owner.charAt(0) : '?'}
               </div>
               <div>
-                <p className="font-medium text-gray-900">{gym.owner}</p>
+                <p className="font-medium text-gray-900">{gym.owner || 'N/A'}</p>
                 <Badge label="Verified KYC" variant="success" className="mt-1" />
               </div>
             </div>
@@ -134,7 +134,7 @@ const GymDetails = ({ isOpen, onClose, gym }) => {
         )}
         {activeTab !== 'overview' && (
           <div className="flex items-center justify-center h-48 text-gray-400">
-            {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Data Placeholder
+            {(activeTab || '').charAt(0).toUpperCase() + (activeTab || '').slice(1)} Data Placeholder
           </div>
         )}
       </div>

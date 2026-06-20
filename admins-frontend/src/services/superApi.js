@@ -2,11 +2,11 @@ import axiosInstance from './axiosInstance';
 
 // DASHBOARD
 export const getDashboardStats = async () => {
-  return { data: { totalUsers: 1500, totalGyms: 120, totalRevenue: 450000, activeBookings: 85 } };
+  return axiosInstance.get('/superadmin/dashboard');
 };
 
 export const getDashboardCharts = async () => {
-  return { data: { userGrowth: [], revenueGrowth: [] } };
+  return axiosInstance.get('/superadmin/dashboard/charts');
 };
 
 export const getRecentActivities = async () => {
@@ -53,8 +53,16 @@ export const rejectGym = async (gymId, reason) => {
 };
 
 // PAYMENTS
-export const getTransactionHistory = async (page = 1, limit = 10, filters = {}) => {
-  return { data: { transactions: [], total: 0, pages: 0 } };
+export const getTransactionHistory = async (params) => {
+  return axiosInstance.get('/admins/transactions', { params });
+};
+
+export const getPendingPayouts = async () => {
+  return axiosInstance.get('/admins/payouts/pending');
+};
+
+export const getRevenueReports = async (params) => {
+  return axiosInstance.get('/admins/revenue/reports', { params });
 };
 
 // CMS
@@ -75,7 +83,15 @@ export const getAllGymOwners = async () => {
   return axiosInstance.get('/superadmin/gym-owners');
 };
 
+export const updateGymOwnerStatus = async (ownerId, status) => {
+  return axiosInstance.patch(`/superadmin/gym-owners/${ownerId}/status`, { status });
+};
+
 // TRAINERS
 export const getAllTrainers = async () => {
   return axiosInstance.get('/superadmin/trainers');
+};
+
+export const updateTrainerStatus = async (trainerId, status) => {
+  return axiosInstance.patch(`/superadmin/trainers/${trainerId}/status`, { status });
 };

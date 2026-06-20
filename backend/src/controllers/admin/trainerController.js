@@ -136,9 +136,18 @@ exports.approveTrainer = async (req, res) => {
     const trainer = await Trainer.findById(req.params.trainerId);
     if (!trainer) return res.status(404).json({ success: false, message: 'Trainer not found' });
 
-    // City admin city check
+    // Validate admin roles
     const adminRole = getAdminRole(req.admin);
-    if ((adminRole === 'City Admin' || adminRole === 'city_admin') && req.admin.assignedCities) {
+    const isAllowedAdmin = ['Super Admin', 'Platform Admin', 'platform_admin', 'City Admin', 'city_admin'].includes(adminRole);
+    if (!isAllowedAdmin) {
+      return res.status(403).json({ success: false, message: "Unauthorized. Admin role required." });
+    }
+
+    // City admin city check
+    if (adminRole === 'City Admin' || adminRole === 'city_admin') {
+      if (!req.admin.assignedCities) {
+        return res.status(403).json({ success: false, message: "City Admin has no assigned cities" });
+      }
       const hasAccess = req.admin.assignedCities.some(c => c.toLowerCase() === trainer.city?.toLowerCase());
       if (!hasAccess) {
         return res.status(403).json({ success: false, message: "You don't have access to this city's trainers" });
@@ -147,6 +156,7 @@ exports.approveTrainer = async (req, res) => {
 
     trainer.status = 'approved';
     trainer.approvedAt = new Date();
+    trainer.approvedBy = req.admin._id;
     trainer.verifiedBy = {
       adminId: req.admin._id,
       adminRole,
@@ -188,9 +198,18 @@ exports.rejectTrainer = async (req, res) => {
     const trainer = await Trainer.findById(req.params.trainerId);
     if (!trainer) return res.status(404).json({ success: false, message: 'Trainer not found' });
 
-    // City admin city check
+    // Validate admin roles
     const adminRole = getAdminRole(req.admin);
-    if ((adminRole === 'City Admin' || adminRole === 'city_admin') && req.admin.assignedCities) {
+    const isAllowedAdmin = ['Super Admin', 'Platform Admin', 'platform_admin', 'City Admin', 'city_admin'].includes(adminRole);
+    if (!isAllowedAdmin) {
+      return res.status(403).json({ success: false, message: "Unauthorized. Admin role required." });
+    }
+
+    // City admin city check
+    if (adminRole === 'City Admin' || adminRole === 'city_admin') {
+      if (!req.admin.assignedCities) {
+        return res.status(403).json({ success: false, message: "City Admin has no assigned cities" });
+      }
       const hasAccess = req.admin.assignedCities.some(c => c.toLowerCase() === trainer.city?.toLowerCase());
       if (!hasAccess) {
         return res.status(403).json({ success: false, message: "You don't have access to this city's trainers" });
@@ -199,6 +218,8 @@ exports.rejectTrainer = async (req, res) => {
 
     trainer.status = 'rejected';
     trainer.rejectionReason = rejectionReason;
+    trainer.rejectedAt = new Date();
+    trainer.rejectedBy = req.admin._id;
     trainer.statusHistory.push({
       status: 'rejected',
       changedBy: req.admin._id,
@@ -366,10 +387,10 @@ exports.getPublicTrainers = async (req, res) => {
     if (req.query.maxPrice) query.pricePerSession = { ...query.pricePerSession, $lte: Number(req.query.maxPrice) };
 
     const trainers = await Trainer.find(query)
-      .select('name profilePhoto specializations pricePerSession rating trainingTypes city experience')
+      .select('name profilePhoto specializations pricePerSession rating trainingTypes city experience review clients')
       .skip(skip).limit(limit);
     const total = await Trainer.countDocuments(query);
-
+ 
     res.status(200).json({
       success: true,
       trainers: trainers.map(t => ({
@@ -381,7 +402,9 @@ exports.getPublicTrainers = async (req, res) => {
         rating: t.rating?.average || 0,
         trainingTypes: t.trainingTypes,
         city: t.city,
-        experience: t.experience
+        experience: t.experience,
+        review: t.review,
+        clients: t.clients
       })),
       total,
       pages: Math.ceil(total / limit)

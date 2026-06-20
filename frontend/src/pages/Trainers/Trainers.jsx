@@ -327,7 +327,7 @@ function TrainerCard({ trainer, fav, onFav }) {
       {/* Image */}
       <div className="relative h-[200px] overflow-hidden">
         <img
-          src={trainer.image}
+          src={trainer.photo || trainer.profilePhoto || trainer.image || "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=400&h=500&fit=crop&crop=faces&q=85"}
           alt={trainer.name}
           loading="lazy"
           className="w-full h-full object-cover object-top transition-transform duration-400 group-hover:scale-105"
@@ -371,7 +371,7 @@ function TrainerCard({ trainer, fav, onFav }) {
         <div className="flex items-center gap-1.5 text-[0.68rem] text-white/35 mb-1.5">
           {trainer.experience} Exp
           <span className="w-[3px] h-[3px] rounded-full bg-white/30" />
-          {trainer.clients} Clients
+          {trainer.clients || "0"} Clients
         </div>
 
         <div className="flex items-center gap-1 mb-1.5">
@@ -540,6 +540,18 @@ function TrainerDetail({ trainer, onBack }) {
             <SectionLabel>About Me</SectionLabel>
             <p className="text-[0.85rem] text-white/60 leading-[1.78]">{bioText}</p>
           </div>
+
+          {/* Featured Review */}
+          {trainer.review && (
+            <div>
+              <SectionLabel>Featured Review</SectionLabel>
+              <div className="bg-[#FF7A00]/05 border border-[#FF7A00]/20 rounded-xl p-4 italic text-white/80 text-[0.85rem] relative">
+                <span className="text-3xl text-[#FF7A00]/30 absolute top-1 left-2 font-serif">“</span>
+                <p className="pl-6 pr-4">{trainer.review}</p>
+                <span className="text-3xl text-[#FF7A00]/30 absolute bottom-1 right-2 font-serif">”</span>
+              </div>
+            </div>
+          )}
 
           {/* Specializations */}
           <div>

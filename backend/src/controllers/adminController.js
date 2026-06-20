@@ -196,6 +196,85 @@ exports.setupPassword = async (req, res) => {
   }
 };
 
+// Get City Admins with their gym owners and gyms (Platform Admin view)
+exports.getCityAdmins = async (req, res) => {
+  try {
+    const Admin = require('../models/Admin');
+    const GymOwner = require('../models/GymOwner');
+    const Gym = require('../models/Gym');
+
+    // Fetch all city admins
+    const cityAdmins = await Admin.find({ adminType: 'city_admin' })
+      .select('-password -setupToken -setupTokenExpiry')
+      .sort({ createdAt: -1 });
+
+    // For each city admin, find gym owners in their city and count gyms
+    const result = await Promise.all(
+      cityAdmins.map(async (admin) => {
+        const city = admin.city || (admin.assignedCities && admin.assignedCities[0]);
+
+        let gymOwners = [];
+        let gymCount = 0;
+
+        if (city) {
+          // Find gym owners who have gyms in this city
+          const gymsInCity = await Gym.find({ 'location.city': new RegExp(`^${city}$`, 'i') })
+            .select('ownerId name location verified active');
+          
+          gymCount = gymsInCity.length;
+
+          // Get unique owner IDs
+          const ownerIds = [...new Set(gymsInCity.map(g => g.ownerId?.toString()).filter(Boolean))];
+
+          // Fetch owner details
+          const owners = await GymOwner.find({ _id: { $in: ownerIds } })
+            .select('name email phone status gyms');
+
+          // Attach gyms to each owner
+          gymOwners = owners.map(owner => {
+            const ownerGyms = gymsInCity.filter(g => g.ownerId?.toString() === owner._id.toString());
+            return {
+              _id: owner._id,
+              name: owner.name,
+              email: owner.email,
+              phone: owner.phone,
+              status: owner.status,
+              gymCount: ownerGyms.length,
+              gyms: ownerGyms.map(g => ({
+                _id: g._id,
+                name: g.name,
+                city: g.location?.city,
+                address: g.location?.address,
+                verified: g.verified,
+                active: g.active
+              }))
+            };
+          });
+        }
+
+        return {
+          _id: admin._id,
+          fullName: admin.fullName,
+          email: admin.email,
+          phone: admin.phone,
+          city: city || 'Not Assigned',
+          status: admin.status,
+          lastLogin: admin.lastLogin,
+          createdAt: admin.createdAt,
+          gymOwnerCount: gymOwners.length,
+          gymCount,
+          gymOwners
+        };
+      })
+    );
+
+    res.status(200).json({ success: true, cityAdmins: result });
+  } catch (error) {
+    console.error('Error in getCityAdmins:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch city admins.', error: error.message });
+  }
+};
+
 // Admin Login
 exports.login = async (req, res) => {
   try {

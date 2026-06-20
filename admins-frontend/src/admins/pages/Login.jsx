@@ -64,7 +64,7 @@ const Login = () => {
             </svg>
           </div>
           <h2 className="text-3xl font-extrabold text-white tracking-tight leading-tight">
-            Find Gym <span className="text-[#FF7A00]">Admin Portal</span>
+            LifeCell.Fitness <span className="text-[#FF7A00]">Admin Portal</span>
           </h2>
           <p className="mt-2 text-sm text-gray-400">
             Sign in to manage the platform
@@ -105,7 +105,7 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-11 appearance-none block w-full px-3 py-3 border border-white/10 rounded-xl bg-black/40 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF7A00]/20 focus:border-[#FF7A00] sm:text-sm transition-all"
-                    placeholder="admin@findgym.com"
+                    placeholder="admin@lifecell.fitness"
                   />
                 </div>
               </div>

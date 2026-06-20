@@ -5,6 +5,7 @@ const User = require('../models/User');
 const Admin = require('../models/Admin');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const { sendTrainerRegistrationEmail, sendTrainerAdminNotification } = require('../utils/email');
+const { verifiedEmails } = require('../utils/otpStore');
 
 // Helper to encrypt simple fields if needed. For now, we will store them. Aadhar number and PAN can be masked or saved securely.
 // Validation helpers
@@ -118,17 +119,48 @@ exports.registerTrainer = async (req, res) => {
       }
     }
 
-    // Check unique email in Trainer and User collections
-    const existingTrainer = await Trainer.findOne({ email: email.toLowerCase() });
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    // Enforce OTP verification before registration
+    const isOtpVerified = verifiedEmails[email.toLowerCase()] && 
+                          verifiedEmails[email.toLowerCase()].verified && 
+                          Date.now() < verifiedEmails[email.toLowerCase()].expires;
+    if (!isOtpVerified) {
+      return res.status(400).json({ success: false, message: "Please verify your email via OTP first" });
+    }
+
+    // Check unique email and phone in Trainer and User collections
+    const existingTrainer = await Trainer.findOne({
+      $or: [
+        { email: email.toLowerCase() },
+        { phone }
+      ]
+    });
+    const existingUser = await User.findOne({
+      $or: [
+        { email: email.toLowerCase() },
+        { phone }
+      ]
+    });
     if (existingTrainer || existingUser) {
-      return res.status(400).json({ success: false, message: "Email is already registered" });
+      return res.status(400).json({ success: false, message: "Email or phone number is already registered" });
     }
 
     // Handle File Uploads (Cloudinary fallback)
     const profilePhotoFile = req.files && req.files['profilePhoto'] ? req.files['profilePhoto'][0] : null;
     const aadharCardFile = req.files && req.files['aadharCard'] ? req.files['aadharCard'][0] : null;
     const certificatesList = req.files && req.files['certificates'] ? req.files['certificates'] : [];
+
+    // File validation sizes (max 5MB)
+    if (profilePhotoFile && profilePhotoFile.size > 5 * 1024 * 1024) {
+      return res.status(400).json({ success: false, message: "Profile photo size must be less than 5MB" });
+    }
+    if (aadharCardFile && aadharCardFile.size > 5 * 1024 * 1024) {
+      return res.status(400).json({ success: false, message: "Aadhar Card size must be less than 5MB" });
+    }
+    for (const cert of certificatesList) {
+      if (cert.size > 5 * 1024 * 1024) {
+        return res.status(400).json({ success: false, message: "Certificate document size must be less than 5MB" });
+      }
+    }
 
     if (!aadharCardFile) {
       return res.status(400).json({ success: false, message: "Aadhar Card upload is required" });
@@ -198,6 +230,7 @@ exports.registerTrainer = async (req, res) => {
     });
 
     await trainer.save();
+    delete verifiedEmails[email.toLowerCase()];
 
     // Generate JWT token for immediate login after registration
     const token = jwt.sign(

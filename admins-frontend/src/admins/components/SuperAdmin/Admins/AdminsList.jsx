@@ -94,7 +94,7 @@ const AdminsList = () => {
       title: 'Status', 
       key: 'status',
       render: (row) => (
-        <Badge label={row.status} variant={row.status === 'Active' ? 'success' : 'default'} />
+        <Badge label={row.status} variant={row.status === 'Active' ? 'success' : row.status === 'Suspended' ? 'danger' : 'default'} />
       )
     },
     { 
@@ -120,12 +120,43 @@ const AdminsList = () => {
     { 
       title: 'Actions', 
       key: 'actions',
-      render: (row) => (
-        <div className="flex gap-2">
-           <Button variant="secondary" size="sm">Edit</Button>
-           <Button variant="danger" size="sm" onClick={() => handleDelete(row)}>Delete</Button>
-        </div>
-      )
+      render: (row) => {
+        const handleToggleStatus = async () => {
+          const newStatus = row.status === 'Active' ? 'Suspended' : 'Active';
+          if (!window.confirm(`Are you sure you want to ${newStatus === 'Active' ? 'activate' : 'suspend'} this admin?`)) return;
+          try {
+            const baseUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
+            const token = localStorage.getItem('superAdminToken');
+            const response = await fetch(`${baseUrl}/api/admins/${row._id}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ status: newStatus })
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+              fetchAdmins();
+            } else {
+              alert(data.message || 'Failed to update admin status');
+            }
+          } catch (error) {
+            console.error('Error updating status:', error);
+            alert('Failed to update status.');
+          }
+        };
+
+        return (
+          <div className="flex gap-2">
+             <Button variant="secondary" size="sm">Edit</Button>
+             <Button variant="secondary" size="sm" onClick={handleToggleStatus}>
+               {row.status === 'Active' ? 'Suspend' : 'Activate'}
+             </Button>
+             <Button variant="danger" size="sm" onClick={() => handleDelete(row)}>Delete</Button>
+          </div>
+        );
+      }
     },
   ];
 

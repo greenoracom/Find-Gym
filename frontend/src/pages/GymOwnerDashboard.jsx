@@ -20,16 +20,19 @@ import {
   Menu,
   X,
   Eye,
-  Settings
+  Settings,
+  CreditCard
 } from 'lucide-react';
 
 const GymOwnerDashboard = () => {
   const navigate = useNavigate();
   const [owner, setOwner] = useState(null);
   const [gyms, setGyms] = useState([]);
+  const [memberships, setMemberships] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [membershipsLoading, setMembershipsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('overview'); // overview or kyc
+  const [activeTab, setActiveTab] = useState('overview'); // overview, kyc, memberships
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedGymForModal, setSelectedGymForModal] = useState(null);
 
@@ -58,6 +61,21 @@ const GymOwnerDashboard = () => {
     }
   };
 
+  const fetchMemberships = async () => {
+    try {
+      setMembershipsLoading(true);
+      const response = await api.get('/memberships/owner');
+      if (response.data.success) {
+        setMemberships(response.data.data);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch memberships data.');
+    } finally {
+      setMembershipsLoading(false);
+    }
+  };
+
   useEffect(() => {
     const storedOwner = localStorage.getItem('gymOwner');
     if (!storedOwner) {
@@ -67,6 +85,12 @@ const GymOwnerDashboard = () => {
     setOwner(JSON.parse(storedOwner));
     fetchDashboardData();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'memberships') {
+      fetchMemberships();
+    }
+  }, [activeTab]);
 
   const handleDeleteGym = async (gymId) => {
     if (!window.confirm("Are you sure you want to delete this gym? This action cannot be undone.")) return;
@@ -106,7 +130,7 @@ const GymOwnerDashboard = () => {
           <div className="flex items-center gap-2">
             <Dumbbell className="w-6 h-6 text-orange-500" />
             <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-600">
-              Find Gym Owner
+              LifeCell.Fitness Owner
             </span>
           </div>
           <button onClick={() => setSidebarOpen(false)} className="md:hidden text-slate-400 hover:text-white">
@@ -128,6 +152,21 @@ const GymOwnerDashboard = () => {
           >
             <LayoutDashboard className="w-5 h-5" />
             <span>Dashboard</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveTab('memberships');
+              setSidebarOpen(false);
+            }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium ${
+              activeTab === 'memberships'
+                ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
+                : 'text-slate-300 hover:bg-slate-805 hover:text-white'
+            }`}
+          >
+            <CreditCard className="w-5 h-5" />
+            <span>Memberships</span>
           </button>
 
           <button
@@ -379,7 +418,84 @@ const GymOwnerDashboard = () => {
               </div>
             </>
           )}
+          {activeTab === 'memberships' && (
+            <div className="space-y-6">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <CreditCard className="text-orange-500 w-5 h-5" />
+                <span>Gym Membership Bookings</span>
+              </h3>
 
+              {membershipsLoading ? (
+                <div className="bg-white border border-slate-200 p-12 text-center rounded-2xl shadow-sm">
+                  <div className="w-8 h-8 border-4 border-t-orange-500 border-slate-200 rounded-full animate-spin mx-auto mb-3"></div>
+                  <p className="text-slate-500 text-sm">Fetching memberships...</p>
+                </div>
+              ) : memberships.length === 0 ? (
+                <div className="bg-white border border-slate-200 p-12 text-center rounded-2xl shadow-sm">
+                  <p className="text-slate-500 font-medium">No memberships purchased yet.</p>
+                </div>
+              ) : (
+                <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 text-sm font-semibold">
+                          <th className="p-4">Customer Details</th>
+                          <th className="p-4">Gym Name</th>
+                          <th className="p-4">Plan Name</th>
+                          <th className="p-4">Invoice No</th>
+                          <th className="p-4">Price Paid</th>
+                          <th className="p-4">Validity</th>
+                          <th className="p-4">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-slate-700 text-sm divide-y divide-slate-100">
+                        {memberships.map((membership) => (
+                          <tr key={membership._id} className="hover:bg-slate-50 transition-colors">
+                            <td className="p-4">
+                              <div className="font-semibold text-slate-900">{membership.customerId?.name || 'N/A'}</div>
+                              <div className="text-xs text-slate-500">{membership.customerId?.email}</div>
+                              <div className="text-xs text-slate-500">{membership.customerId?.phone}</div>
+                            </td>
+                            <td className="p-4 font-medium text-slate-800">
+                              {membership.gymId?.name || 'N/A'}
+                            </td>
+                            <td className="p-4">
+                              <span className="font-medium">{membership.planTitle}</span>
+                              {membership.planType && (
+                                <span className="text-xs text-slate-500 block">Type: {membership.planType}</span>
+                              )}
+                            </td>
+                            <td className="p-4 font-mono text-slate-600">
+                              {membership.invoiceNumber || 'N/A'}
+                            </td>
+                            <td className="p-4 font-semibold text-slate-900">
+                              ₹{membership.pricePaid?.toLocaleString()}
+                            </td>
+                            <td className="p-4 text-xs text-slate-600">
+                              <div>From: {membership.startDate ? new Date(membership.startDate).toLocaleDateString() : 'N/A'}</div>
+                              <div>To: {membership.endDate ? new Date(membership.endDate).toLocaleDateString() : 'N/A'}</div>
+                            </td>
+                            <td className="p-4">
+                              <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold border ${
+                                membership.status === 'active'
+                                  ? 'bg-green-50 text-green-700 border-green-200'
+                                  : membership.status === 'pending'
+                                  ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                  : 'bg-red-50 text-red-700 border-red-200'
+                              }`}>
+                                {membership.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           {activeTab === 'kyc' && owner && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Personal Details */}

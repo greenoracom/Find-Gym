@@ -29,38 +29,57 @@ const Charts = () => {
 
   useEffect(() => {
     const fetchCharts = async () => {
-      const response = await getDashboardCharts();
-      // Dummy data for visual presentation since API returns empty in stub
-      const dates = ['1', '5', '10', '15', '20', '25', '30'];
-      
-      setData({
-        userGrowth: {
-          labels: dates,
-          datasets: [
-            {
-              fill: true,
-              label: 'New Users',
-              data: [120, 200, 150, 280, 220, 310, 350],
-              borderColor: '#F97316',
-              backgroundColor: 'rgba(249, 115, 22, 0.1)',
-              tension: 0.4
-            },
-          ],
-        },
-        revenueGrowth: {
-          labels: dates,
-          datasets: [
-            {
-              fill: true,
-              label: 'Revenue (₹)',
-              data: [50000, 75000, 60000, 105000, 85000, 130000, 150000],
-              borderColor: '#10B981',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              tension: 0.4
-            },
-          ],
-        }
-      });
+      try {
+        const response = await getDashboardCharts();
+        const apiData = response.data || { userGrowth: [], revenueGrowth: [] };
+
+        // Process user growth dates and counts
+        const userDates = apiData.userGrowth.length > 0 
+          ? apiData.userGrowth.map(item => item._id.substring(5)) 
+          : ['1', '5', '10', '15', '20', '25', '30'];
+        const userCounts = apiData.userGrowth.length > 0 
+          ? apiData.userGrowth.map(item => item.count) 
+          : [120, 200, 150, 280, 220, 310, 350];
+
+        // Process revenue growth dates and values
+        const revDates = apiData.revenueGrowth.length > 0 
+          ? apiData.revenueGrowth.map(item => item._id.substring(5)) 
+          : ['1', '5', '10', '15', '20', '25', '30'];
+        const revTotals = apiData.revenueGrowth.length > 0 
+          ? apiData.revenueGrowth.map(item => item.total) 
+          : [50000, 75000, 60000, 105000, 85000, 130000, 150000];
+
+        setData({
+          userGrowth: {
+            labels: userDates,
+            datasets: [
+              {
+                fill: true,
+                label: 'New Users',
+                data: userCounts,
+                borderColor: '#F97316',
+                backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                tension: 0.4
+              },
+            ],
+          },
+          revenueGrowth: {
+            labels: revDates,
+            datasets: [
+              {
+                fill: true,
+                label: 'Revenue (₹)',
+                data: revTotals,
+                borderColor: '#10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4
+              },
+            ],
+          }
+        });
+      } catch (error) {
+        console.error("Failed to load charts data", error);
+      }
     };
     fetchCharts();
   }, []);

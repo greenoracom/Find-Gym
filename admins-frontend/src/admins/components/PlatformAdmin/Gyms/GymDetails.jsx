@@ -61,10 +61,10 @@ const GymDetails = ({ gymId, onClose }) => {
                       gym.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                       gym.status === 'suspended' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'
                     }`}>
-                      {gym.status.toUpperCase()}
+                      {(gym.status || 'pending').toUpperCase()}
                     </span>
                     <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold flex items-center">
-                      ⭐ {gym.rating}
+                      ⭐ {gym.rating && typeof gym.rating === 'object' ? (gym.rating.average || 0) : (gym.rating || 0)}
                     </span>
                   </div>
                 </div>

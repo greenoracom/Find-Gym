@@ -369,7 +369,7 @@ const GymSetup = () => {
         <div className="p-6 border-b border-slate-800 flex items-center gap-2.5">
           <Dumbbell className="w-6 h-6 text-orange-500" />
           <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-600">
-            Find Gym Owner
+            LifeCell.Fitness Owner
           </span>
         </div>
 

@@ -221,4 +221,10 @@ export const rejectGymOwner = async (ownerId, reason) => {
   return response.data;
 };
 
+// City Admins (Platform Admin view)
+export const getCityAdmins = async () => {
+  const response = await api.get('/city-admins');
+  return response.data;
+};
+
 export default api;

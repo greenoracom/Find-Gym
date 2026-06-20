@@ -8,22 +8,34 @@ exports.getAllGyms = async (req, res) => {
     const skip = (page - 1) * limit;
 
     let query = {};
-    
+
     if (req.query.search) {
       const searchRegex = new RegExp(req.query.search, 'i');
       query.$or = [
         { name: searchRegex },
-        { city: searchRegex },
-        { ownerName: searchRegex }
+        { 'location.city': searchRegex },
+        { 'location.address': searchRegex }
       ];
     }
 
+    // Map status filter to actual schema fields
     if (req.query.status && req.query.status !== 'all') {
-      query.status = req.query.status;
+      if (req.query.status === 'approved') {
+        query.verified = true;
+        query.active = true;
+      } else if (req.query.status === 'pending') {
+        query.verified = false;
+      } else if (req.query.status === 'suspended') {
+        query.active = false;
+        query.verified = true;
+      } else if (req.query.status === 'rejected') {
+        query.verified = false;
+        query.active = false;
+      }
     }
 
     if (req.query.city) {
-      query.city = req.query.city;
+      query['location.city'] = new RegExp(req.query.city, 'i');
     }
 
     const sortField = req.query.sortBy || 'createdAt';
@@ -39,20 +51,39 @@ exports.getAllGyms = async (req, res) => {
 
     const totalCount = await Gym.countDocuments(query);
 
+    // Derive a readable status from verified + active flags
+    const deriveStatus = (g) => {
+      if (g.verified && g.active) return 'approved';
+      if (!g.verified && !g.active) return 'rejected';
+      if (!g.verified && g.active) return 'pending';
+      if (g.verified && !g.active) return 'suspended';
+      return 'pending';
+    };
+
     res.status(200).json({
       success: true,
       data: {
         gyms: gyms.map(g => ({
           id: g._id,
           name: g.name,
-          city: g.city || g.location?.city,
-          ownerName: g.ownerId?.name || g.ownerName || 'N/A',
-          email: g.ownerId?.email || g.email || 'N/A',
-          phone: g.ownerId?.phone || g.phone || 'N/A',
-          membersCount: g.membersCount,
-          status: g.status,
-          monthlyRevenue: g.monthlyRevenue,
-          rating: g.rating
+          city: g.location?.city || 'N/A',
+          address: g.location?.address || 'N/A',
+          state: g.location?.state || '',
+          ownerName: g.ownerId?.name || 'N/A',
+          ownerEmail: g.ownerId?.email || g.email || 'N/A',
+          ownerPhone: g.ownerId?.phone || g.phone || 'N/A',
+          membersCount: g.currentMembers || 0,
+          capacity: g.capacity || 0,
+          status: deriveStatus(g),
+          verified: g.verified,
+          active: g.active,
+          monthlyRevenue: g.monthlyRevenue || 0,
+          rating: g.rating?.average || 0,
+          ratingCount: g.rating?.count || 0,
+          amenities: g.amenities || [],
+          phone: g.phone,
+          email: g.email,
+          createdAt: g.createdAt
         })),
         pagination: {
           currentPage: page,
@@ -66,6 +97,7 @@ exports.getAllGyms = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 };
+
 
 exports.getGymDetails = async (req, res) => {
   try {

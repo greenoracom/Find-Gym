@@ -65,24 +65,61 @@ const GymOwnersList = () => {
     { 
       title: 'Account', 
       key: 'status',
-      render: (row) => <Badge label={row.status} variant={row.status === 'Active' ? 'success' : 'danger'} />
+      render: (row) => {
+        const variants = { 'Active': 'success', 'Suspended': 'danger', 'Pending': 'warning', 'Rejected': 'danger' };
+        return <Badge label={row.status} variant={variants[row.status] || 'default'} />;
+      }
     },
     { 
       title: 'Actions', 
       key: 'actions',
-      render: (row) => (
-        <div className="flex gap-2">
-           <Button variant="secondary" size="sm">View KYC</Button>
-        </div>
-      )
+      render: (row) => {
+        const handleToggleStatus = async () => {
+          const newStatus = row.status === 'Active' ? 'suspended' : 'active';
+          if (!window.confirm(`Are you sure you want to ${newStatus === 'active' ? 'activate' : 'suspend'} this gym owner?`)) return;
+          try {
+            const { updateGymOwnerStatus } = await import('../../../../services/superApi');
+            const response = await updateGymOwnerStatus(row.id, newStatus);
+            if (response.data && response.data.success) {
+              fetchOwners();
+            } else {
+              alert('Failed to update status.');
+            }
+          } catch (error) {
+            console.error(error);
+            alert('Failed to update status.');
+          }
+        };
+
+        const handleViewKYC = () => {
+          setSelectedOwnerForModal(row);
+        };
+
+        return (
+          <div className="flex gap-2">
+             <Button variant="secondary" size="sm" onClick={handleViewKYC}>View KYC</Button>
+             <Button variant="secondary" size="sm" className="text-red-500" onClick={handleToggleStatus}>
+               {row.status === 'Active' ? 'Suspend' : 'Activate'}
+             </Button>
+          </div>
+        );
+      }
     },
   ];
+
+  const [selectedOwnerForModal, setSelectedOwnerForModal] = useState(null);
+  const rawOwners = owners; // placeholder to keep original reference if needed
 
   const filteredOwners = owners.filter(owner => 
     owner.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     owner.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     owner.phone?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const fetchFullOwnerDetails = async () => {
+    // Helper to get raw object from backend for kyc documents
+    if (!selectedOwnerForModal) return null;
+  };
 
   if (loading) {
     return (
@@ -91,6 +128,9 @@ const GymOwnersList = () => {
       </div>
     );
   }
+
+  // Find detailed selected owner data to display documents
+  const selectedOwnerRaw = selectedOwnerForModal;
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -117,6 +157,27 @@ const GymOwnersList = () => {
         
         <Table data={filteredOwners} columns={columns} />
       </div>
+
+      {selectedOwnerForModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-100 flex flex-col p-6 animate-in zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-slate-900 mb-4">{selectedOwnerForModal.name}'s Profile & KYC</h3>
+            <div className="space-y-3 text-left">
+              <div><strong className="text-sm text-gray-500">Email:</strong> <span className="text-gray-900 text-sm font-medium">{selectedOwnerForModal.email}</span></div>
+              <div><strong className="text-sm text-gray-500">Phone:</strong> <span className="text-gray-900 text-sm font-medium">{selectedOwnerForModal.phone}</span></div>
+              <div><strong className="text-sm text-gray-500">Gyms Registered:</strong> <span className="text-gray-900 text-sm font-medium">{selectedOwnerForModal.gyms}</span></div>
+              <div><strong className="text-sm text-gray-500">KYC Status:</strong> <span className="text-gray-900 text-sm font-medium">{selectedOwnerForModal.kyc}</span></div>
+              <div><strong className="text-sm text-gray-500">Account Status:</strong> <span className="text-gray-900 text-sm font-medium">{selectedOwnerForModal.status}</span></div>
+              <div className="border-t pt-3 mt-3">
+                <p className="text-sm text-gray-500 mb-2">Note: To download/verify full uploaded Aadhaar/PAN and Bank documents, please approve or reject them directly from their registered dashboard profiles.</p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button variant="secondary" onClick={() => setSelectedOwnerForModal(null)}>Close</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

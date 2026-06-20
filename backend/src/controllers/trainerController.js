@@ -2,6 +2,43 @@ const Trainer = require('../models/Trainer');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const { sendTrainerActiveEmail } = require('../utils/email');
 
+const timeToMinutes = (timeStr) => {
+  const match = timeStr.trim().match(/^(\d+):(\d+)\s*(AM|PM)$/i);
+  if (!match) return null;
+  let hours = parseInt(match[1]);
+  const minutes = parseInt(match[2]);
+  const ampm = match[3].toUpperCase();
+  if (ampm === 'PM' && hours < 12) hours += 12;
+  if (ampm === 'AM' && hours === 12) hours = 0;
+  return hours * 60 + minutes;
+};
+
+const checkOverlap = (slots) => {
+  const ranges = [];
+  for (const slot of slots) {
+    if (slot.includes('-')) {
+      const parts = slot.split('-');
+      const start = timeToMinutes(parts[0]);
+      const end = timeToMinutes(parts[1]);
+      if (start !== null && end !== null) {
+        ranges.push({ start, end });
+      }
+    } else {
+      const start = timeToMinutes(slot);
+      if (start !== null) {
+        ranges.push({ start, end: start + 60 });
+      }
+    }
+  }
+  ranges.sort((a, b) => a.start - b.start);
+  for (let i = 0; i < ranges.length - 1; i++) {
+    if (ranges[i].end > ranges[i + 1].start) {
+      return true; // Overlap detected
+    }
+  }
+  return false;
+};
+
 exports.getTrainerProfile = async (req, res) => {
   try {
     // req.trainer comes from protectTrainer middleware
@@ -27,8 +64,33 @@ exports.updateTrainerProfile = async (req, res) => {
       name, phone, dateOfBirth, gender, city,
       specializations, experience, certifications, bio, languages,
       trainingTypes, pricePerSession, pricePerMonth, availability,
-      trialSession, trialPrice
+      trialSession, trialPrice,
+      aadharNumber, panNumber, bankAccountNumber, bankIfscCode, bankAccountHolderName,
+      review, rating, clients
     } = req.body;
+
+    // Re-validate required fields on every update
+    const validateName = name !== undefined ? name : trainer.name;
+    const validatePhone = phone !== undefined ? phone : trainer.phone;
+    const validateCity = city !== undefined ? city : trainer.city;
+    const validateBio = bio !== undefined ? bio : trainer.bio;
+    const validatePrice = pricePerSession !== undefined ? Number(pricePerSession) : trainer.pricePerSession;
+
+    if (validateName !== undefined && (!validateName || validateName.trim().length < 3)) {
+      return res.status(400).json({ success: false, message: "Name is required and must be at least 3 characters" });
+    }
+    if (validatePhone !== undefined && (!validatePhone || validatePhone.replace(/\D/g, '').length !== 10)) {
+      return res.status(400).json({ success: false, message: "Phone number is required and must be 10 digits" });
+    }
+    if (validateCity !== undefined && !validateCity) {
+      return res.status(400).json({ success: false, message: "City is required" });
+    }
+    if (validateBio !== undefined && (!validateBio || validateBio.trim().length < 50)) {
+      return res.status(400).json({ success: false, message: "Bio is required and must be at least 50 characters" });
+    }
+    if (validatePrice !== undefined && (isNaN(validatePrice) || validatePrice <= 0)) {
+      return res.status(400).json({ success: false, message: "Price per session must be greater than 0" });
+    }
 
     // Optional uploads
     const profilePhotoFile = req.files && req.files['profilePhoto'] ? req.files['profilePhoto'][0] : null;
@@ -43,11 +105,38 @@ exports.updateTrainerProfile = async (req, res) => {
     if (gender) trainer.gender = gender;
     if (city) trainer.city = city;
     if (bio) trainer.bio = bio;
+    if (review) trainer.review = review;
+    if (clients !== undefined) trainer.clients = clients;
+    if (rating) {
+      if (!trainer.rating) trainer.rating = { average: 0, count: 0 };
+      trainer.rating.average = Number(rating);
+    }
     if (pricePerSession) trainer.pricePerSession = Number(pricePerSession);
     if (pricePerMonth) trainer.pricePerMonth = Number(pricePerMonth);
     if (trialSession !== undefined) trainer.trialSession = trialSession === 'true' || trialSession === true;
     if (trialPrice) trainer.trialPrice = Number(trialPrice);
     if (experience) trainer.experience = Number(experience);
+
+    if (aadharNumber) {
+      if (!trainer.kyc) trainer.kyc = {};
+      trainer.kyc.aadharNumber = aadharNumber;
+    }
+    if (panNumber) {
+      if (!trainer.kyc) trainer.kyc = {};
+      trainer.kyc.panNumber = panNumber;
+    }
+    if (bankAccountNumber) {
+      if (!trainer.bankAccount) trainer.bankAccount = {};
+      trainer.bankAccount.accountNumber = bankAccountNumber;
+    }
+    if (bankIfscCode) {
+      if (!trainer.bankAccount) trainer.bankAccount = {};
+      trainer.bankAccount.ifscCode = bankIfscCode;
+    }
+    if (bankAccountHolderName) {
+      if (!trainer.bankAccount) trainer.bankAccount = {};
+      trainer.bankAccount.accountHolderName = bankAccountHolderName;
+    }
 
     if (specializations) {
       trainer.specializations = Array.isArray(specializations) ? specializations : JSON.parse(specializations);
@@ -62,7 +151,16 @@ exports.updateTrainerProfile = async (req, res) => {
       trainer.trainingTypes = Array.isArray(trainingTypes) ? trainingTypes : JSON.parse(trainingTypes);
     }
     if (availability) {
-      trainer.availability = typeof availability === 'string' ? JSON.parse(availability) : availability;
+      const parsedAvail = typeof availability === 'string' ? JSON.parse(availability) : availability;
+      if (parsedAvail && Array.isArray(parsedAvail.timeSlots)) {
+        if (checkOverlap(parsedAvail.timeSlots)) {
+          return res.status(400).json({ success: false, message: "Time slots overlap. Please check your timings." });
+        }
+      }
+      if (parsedAvail) {
+        parsedAvail.timezone = parsedAvail.timezone || 'Asia/Kolkata';
+      }
+      trainer.availability = parsedAvail;
     }
 
     // Transition state from approved to active if full profile is completed
@@ -163,10 +261,23 @@ exports.reapplyTrainer = async (req, res) => {
 exports.updateAvailability = async (req, res) => {
   try {
     const { availability } = req.body;
+    if (!availability || !Array.isArray(availability.timeSlots)) {
+      return res.status(400).json({ success: false, message: "Invalid availability data" });
+    }
+
+    // Check overlap
+    const hasOverlap = checkOverlap(availability.timeSlots);
+    if (hasOverlap) {
+      return res.status(400).json({ success: false, message: "Time slots overlap. Please check your timings." });
+    }
+
     const trainer = await Trainer.findById(req.trainer._id);
     if (!trainer) {
       return res.status(404).json({ success: false, message: "Trainer not found" });
     }
+
+    // Default timezone Asia/Kolkata
+    availability.timezone = availability.timezone || 'Asia/Kolkata';
 
     trainer.availability = availability;
     await trainer.save();
@@ -178,32 +289,26 @@ exports.updateAvailability = async (req, res) => {
 
 exports.getTrainerBookings = async (req, res) => {
   try {
+    const Booking = require('../models/Booking');
     const User = require('../models/User');
-    const memberUser = await User.findOne({ role: 'member' }).sort({ createdAt: -1 });
-    const clientName = memberUser ? memberUser.name : "Amit Sharma";
+    
+    const bookings = await Booking.find({ trainerId: req.trainer._id })
+      .populate('customerId', 'name')
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
-      bookings: [
-        { 
-          id: "B1", 
-          clientName: clientName, 
-          type: req.trainer?.trainingTypes?.[0] || "Personal Training", 
-          date: "2026-06-20", 
-          time: req.trainer?.availability?.timeSlots?.[0] || "6:00 AM", 
-          price: req.trainer?.pricePerSession || 500, 
-          status: "Confirmed" 
-        },
-        { 
-          id: "B2", 
-          clientName: "Pooja Patil", 
-          type: req.trainer?.trainingTypes?.[1] || "Online Training", 
-          date: "2026-06-22", 
-          time: req.trainer?.availability?.timeSlots?.[1] || "7:00 AM", 
-          price: req.trainer?.pricePerSession || 500, 
-          status: "Completed" 
-        }
-      ]
+      bookings: bookings.map(b => ({
+        id: b._id,
+        clientName: b.customerId?.name || "Client",
+        type: b.trainingType || "Personal Training",
+        date: b.date,
+        time: b.slot,
+        price: b.price,
+        status: b.status,
+        phone: b.phone || "N/A",
+        address: b.address || "N/A"
+      }))
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -212,15 +317,29 @@ exports.getTrainerBookings = async (req, res) => {
 
 exports.getTrainerEarnings = async (req, res) => {
   try {
+    const Booking = require('../models/Booking');
+    const bookingsList = await Booking.find({ 
+      trainerId: req.trainer._id, 
+      status: { $in: ['confirmed', 'completed'] } 
+    }).sort({ updatedAt: -1 });
+
+    const totalEarnings = req.trainer.totalEarnings || 0;
+    const pendingEarnings = 0; // Set appropriate pending metric
+
     res.status(200).json({
       success: true,
       earnings: {
-        total: req.trainer.totalEarnings || 0,
-        pending: 998,
-        monthly: req.trainer.totalEarnings || 0,
-        transactions: [
-          { id: "TX100", bookingId: "B2", amount: 499, type: "Payout", status: "Completed", date: "2026-06-15" }
-        ]
+        total: totalEarnings,
+        pending: pendingEarnings,
+        monthly: totalEarnings,
+        transactions: bookingsList.map(b => ({
+          id: `TX-${b._id.toString().slice(-6).toUpperCase()}`,
+          bookingId: b._id,
+          amount: b.price,
+          type: "Payout",
+          status: b.status === 'confirmed' ? "Processing" : "Completed",
+          date: b.date
+        }))
       }
     });
   } catch (error) {

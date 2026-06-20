@@ -269,14 +269,14 @@ const UserRegister = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
             </svg>
           </div>
-          <span className="text-white font-black text-xl tracking-tight">Find<span className="text-orange-400">Gym</span></span>
+          <span className="text-white font-black text-xl tracking-tight">LifeCell<span className="text-orange-400">.Fitness</span></span>
         </div>
 
         {/* Hero text */}
         <div className="mb-10">
           <p className="text-orange-400 text-xs font-bold tracking-[0.2em] uppercase mb-4">Start Your Journey</p>
           <h1 className="text-[3.2rem] font-black text-white leading-[1.08] mb-5">
-            Join <span style={{ color: '#FF7A00', textShadow: '0 0 40px rgba(255,122,0,0.4)' }}>Find Gym</span><br />
+            Join <span style={{ color: '#FF7A00', textShadow: '0 0 40px rgba(255,122,0,0.4)' }}>LifeCell.Fitness</span><br />
             and Transform<br />Your Life
           </h1>
           <p className="text-white/55 text-[1rem] leading-[1.7] max-w-[380px]">

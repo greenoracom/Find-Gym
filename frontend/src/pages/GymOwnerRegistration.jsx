@@ -198,13 +198,13 @@ const GymOwnerRegistration = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
             </svg>
           </div>
-          <span className="text-white font-black text-xl tracking-tight">Find<span className="text-orange-400">Gym</span></span>
+          <span className="text-white font-black text-xl tracking-tight">LifeCell<span className="text-orange-400">.Fitness</span></span>
         </div>
 
       <div className="bg-white/[0.06] border border-white/[0.1] backdrop-blur-2xl p-8 rounded-2xl shadow-2xl">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-black tracking-tight">Gym Owner Signup</h2>
-          <p className="text-sm text-white/45 mt-1">Start partnering with Find Gym today</p>
+          <p className="text-sm text-white/45 mt-1">Start partnering with LifeCell.Fitness today</p>
         </div>
 
         <ProgressBar currentStep={step} totalSteps={3} />

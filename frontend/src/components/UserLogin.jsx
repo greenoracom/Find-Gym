@@ -70,7 +70,7 @@ const UserLogin = () => {
             </svg>
           </div>
           <span className="text-white font-black text-xl tracking-tight">
-            Find<span className="text-orange-400">Gym</span>
+            LifeCell<span className="text-orange-400">.Fitness</span>
           </span>
         </div>
 
@@ -117,7 +117,7 @@ const UserLogin = () => {
               </svg>
             </div>
             <span className="text-white font-black text-lg">
-              Find<span className="text-orange-400">Gym</span>
+              LifeCell<span className="text-orange-400">.Fitness</span>
             </span>
           </div>
 
@@ -238,7 +238,7 @@ const UserLogin = () => {
             <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Find Gym
+            Back to LifeCell.Fitness
           </Link>
         </div>
       </div>

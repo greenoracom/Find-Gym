@@ -8,6 +8,7 @@ import { X, Camera, User, Phone, Ruler, Scale, MapPin, Target } from "lucide-rea
 const UserProfile = () => {
   const [profileData, setProfileData] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [memberships, setMemberships] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -49,6 +50,16 @@ const UserProfile = () => {
             }
           } catch (oErr) {
             console.error("Error loading orders:", oErr);
+          }
+          // Fetch user memberships
+          try {
+            const api = (await import('../userServices/api')).default;
+            const memRes = await api.get('/memberships/my');
+            if (memRes.data?.success) {
+              setMemberships(memRes.data.data || []);
+            }
+          } catch (mErr) {
+            console.error("Error loading memberships:", mErr);
           }
         } else {
           toast.error("Failed to load profile details");
@@ -365,76 +376,105 @@ const UserProfile = () => {
 
         {/* Right Panel Content (9 columns) */}
         <div className="lg:col-span-9 flex flex-col gap-6">
-          
-          {/* Top 4 Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {user.stats.map((stat) => (
-              <div 
-                key={stat.id} 
-                className="bg-[#111112] border border-white/5 rounded-2xl p-4 flex flex-col justify-between h-[120px] relative overflow-hidden shadow-md"
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col">
-                    <span className="text-2xl font-black text-white leading-none mt-1">{stat.value}</span>
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1.5">{stat.label}</span>
+
+          {/* Membership Cards */}
+          {memberships.length === 0 ? (
+            <div className="bg-gradient-to-br from-[#2b1b11] via-[#16120e] to-[#0d0b0a] border border-[#FF7A00]/20 rounded-3xl p-6 relative overflow-hidden shadow-xl">
+              <div className="absolute right-6 bottom-4 text-white/[0.02] text-9xl font-black select-none pointer-events-none">👑</div>
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl bg-[#FF7A00]/10 w-12 h-12 rounded-xl flex items-center justify-center border border-[#FF7A00]/20">👑</span>
+                  <div>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Membership Details</p>
+                    <h3 className="text-xl font-black text-white mt-0.5">No Active Membership</h3>
+                    <p className="text-xs text-[#FF7A00] font-bold mt-0.5">Explore gyms near you and subscribe to a plan!</p>
                   </div>
-                  <span className="text-xl bg-white/5 w-8 h-8 rounded-lg flex items-center justify-center border border-white/5">{stat.icon}</span>
                 </div>
-                
-                {/* Micro Sparkline Chart simulation */}
-                <div className="w-full h-4 opacity-30 mt-auto">
-                  <svg className="w-full h-full" viewBox="0 0 100 20" preserveAspectRatio="none">
-                    <path d="M 0,15 Q 20,5 40,12 T 80,4 T 100,10" fill="none" stroke="#FF7A00" strokeWidth="2" />
-                  </svg>
-                </div>
+                <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-gray-400">Inactive</span>
               </div>
-            ))}
-          </div>
-
-          {/* Membership card details (Crown themed) */}
-          <div className="bg-gradient-to-br from-[#2b1b11] via-[#16120e] to-[#0d0b0a] border border-[#FF7A00]/20 rounded-3xl p-6 relative overflow-hidden shadow-xl">
-            {/* Crown Watermark background */}
-            <div className="absolute right-6 bottom-4 text-white/[0.02] text-9xl font-black select-none pointer-events-none transform translate-y-6">
-              👑
-            </div>
-
-            <div className="flex justify-between items-start">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl bg-[#FF7A00]/10 w-12 h-12 rounded-xl flex items-center justify-center border border-[#FF7A00]/20">👑</span>
-                <div>
-                  <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Membership Details</p>
-                  <h3 className="text-xl font-black text-white mt-0.5">{user.membership.gymName}</h3>
-                  <p className="text-xs text-[#FF7A00] font-bold mt-0.5">{user.membership.plan}</p>
-                </div>
+              <div className="w-full border-t border-white/5 my-5" />
+              <div className="flex justify-between items-center">
+                <p className="text-xs text-gray-400 flex items-center gap-1.5"><span>📅</span> Valid till: <strong className="text-white font-semibold">N/A</strong></p>
+                <Link to="/gyms" className="px-4 py-2 bg-[#FF7A00] hover:bg-orange-600 text-white text-xs font-bold rounded-xl transition-all cursor-pointer">Find Gyms &rarr;</Link>
               </div>
-              
-              <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                user.membership.status === "Active" 
-                  ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400" 
-                  : "bg-white/5 border border-white/10 text-gray-400"
-              }`}>
-                {user.membership.status}
-              </span>
             </div>
+          ) : (
+            <div className="space-y-4">
+              {memberships.map((mem) => {
+                const isActive = mem.status === 'active';
+                const isExpired = mem.status === 'expired';
+                const endDate = mem.endDate ? new Date(mem.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A';
+                const startDate = mem.startDate ? new Date(mem.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A';
+                return (
+                  <div key={mem._id} className="bg-gradient-to-br from-[#2b1b11] via-[#16120e] to-[#0d0b0a] border border-[#FF7A00]/20 rounded-3xl p-6 relative overflow-hidden shadow-xl">
+                    <div className="absolute right-6 bottom-4 text-white/[0.02] text-9xl font-black select-none pointer-events-none">👑</div>
+                    {/* Header row */}
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl bg-[#FF7A00]/10 w-12 h-12 rounded-xl flex items-center justify-center border border-[#FF7A00]/20">👑</span>
+                        <div>
+                          <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Membership Details</p>
+                          <h3 className="text-xl font-black text-white mt-0.5">{mem.gymName}</h3>
+                          <p className="text-xs text-[#FF7A00] font-bold mt-0.5">{mem.planTitle} · {mem.duration}</p>
+                        </div>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        isActive ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+                        : isExpired ? 'bg-red-500/10 border border-red-500/30 text-red-400'
+                        : 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
+                      }`}>
+                        {isActive ? 'Active' : isExpired ? 'Expired' : 'Pending'}
+                      </span>
+                    </div>
 
-            <div className="w-full border-t border-white/5 my-5" />
+                    <div className="w-full border-t border-white/5 my-4" />
 
-            <div className="flex justify-between items-center">
-              <p className="text-xs text-gray-400 flex items-center gap-1.5">
-                <span>📅</span> Valid till: <strong className="text-white font-semibold">{user.membership.expiryDate}</strong>
-              </p>
-              
-              {user.membership.status === "Active" ? (
-                <button className="px-4 py-2 border border-[#FF7A00]/30 hover:border-[#FF7A00] text-[#FF7A00] hover:bg-[#FF7A00]/5 text-xs font-bold rounded-xl transition-all cursor-pointer">
-                  Manage &rarr;
-                </button>
-              ) : (
-                <Link to="/gyms" className="px-4 py-2 bg-[#FF7A00] hover:bg-orange-600 text-white text-xs font-bold rounded-xl transition-all cursor-pointer">
-                  Find Gyms &rarr;
-                </Link>
-              )}
+                    {/* Info grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                      <div>
+                        <p className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">Start Date</p>
+                        <p className="text-xs text-white font-semibold mt-0.5">{startDate}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">Valid Till</p>
+                        <p className={`text-xs font-semibold mt-0.5 ${isExpired ? 'text-red-400' : 'text-white'}`}>{endDate}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">Amount Paid</p>
+                        <p className="text-xs text-[#FF7A00] font-bold mt-0.5">₹{mem.pricePaid?.toLocaleString('en-IN')}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">Invoice</p>
+                        <p className="text-xs text-white font-semibold mt-0.5 truncate">{mem.invoiceNumber || '—'}</p>
+                      </div>
+                    </div>
+
+                    {/* Location */}
+                    {mem.gymCity && (
+                      <p className="text-xs text-gray-400 mb-3 flex items-center gap-1">📍 {mem.gymAddress}, {mem.gymCity}</p>
+                    )}
+
+                    {/* Facilities */}
+                    {mem.facilitiesIncluded?.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-4">
+                        {mem.facilitiesIncluded.map((f, i) => (
+                          <span key={i} className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-full text-[10px] text-gray-300 font-medium">✓ {f}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex justify-end">
+                      {isActive ? (
+                        <span className="px-4 py-2 border border-[#FF7A00]/30 text-[#FF7A00] text-xs font-bold rounded-xl">🏋️ Membership Active</span>
+                      ) : (
+                        <Link to="/gyms" className="px-4 py-2 bg-[#FF7A00] hover:bg-orange-600 text-white text-xs font-bold rounded-xl transition-all">Renew / Find Gyms &rarr;</Link>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          </div>
+          )}
 
           {/* Orders Tracking Section */}
           <div className="bg-[#111112] border border-white/5 rounded-3xl p-5 md:p-6 shadow-xl space-y-6">

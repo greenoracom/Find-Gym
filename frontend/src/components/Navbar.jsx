@@ -52,8 +52,8 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/">
-              <h1 className="text-2xl md:text-3xl font-bold text-white">
-                Find <span className="text-[#FF7A00]">Gym</span>
+              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-wide">
+                LifeCell<span className="text-[#FF7A00]">.Fitness</span>
               </h1>
             </Link>
           </div>

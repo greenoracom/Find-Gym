@@ -145,7 +145,7 @@ const Categories = () => {
         key: orderData.keyId,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: 'Find Gym Health Store',
+        name: 'LifeCell.Fitness Health Store',
         description: `Order for ${product.name}`,
         image: product.images?.[0] || 'https://lh3.googleusercontent.com/d/1w8lK1Hw1h...',
         order_id: orderData.razorpayOrderId,
@@ -309,7 +309,7 @@ const Categories = () => {
                       <div>
                         {/* Live Badge Group */}
                         <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#0d1c12] border border-[#142d1a] text-[#22c55e] text-[9.5px] font-black uppercase tracking-wider mb-2.5">
-                          {item.brand || 'FIND GYM LIVE'}
+                          {item.brand || 'LIFECELL.FITNESS LIVE'}
                         </div>
 
                         {/* Title */}
@@ -410,7 +410,7 @@ const Categories = () => {
                       <div>
                         {/* Brand Badge Group */}
                         <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#1c0d0d] border border-[#2d1414] text-[#ef4444] text-[9.5px] font-black uppercase tracking-wider mb-2.5">
-                          {item.brand || 'FIND GYM STORE'}
+                          {item.brand || 'LIFECELL.FITNESS STORE'}
                         </div>
 
                         {/* Title */}

@@ -8,6 +8,7 @@ const PlatformAdminDashboard = () => {
   const getTitle = () => {
     const path = location.pathname;
     if (path.includes('/dashboard')) return 'Dashboard Overview';
+    if (path.includes('/city-admins')) return 'City Admins';
     if (path.includes('/users')) return 'Users Management';
     if (path.includes('/gyms')) return 'Gyms Management';
     if (path.includes('/trainers')) return 'Trainers Management';

@@ -45,3 +45,14 @@ export const uploadGymImage = async (file) => {
   });
   return response.data;
 };
+
+// Membership purchase flow
+export const initiateMembershipPurchase = async (purchaseData) => {
+  const response = await api.post('/memberships/initiate', purchaseData);
+  return response.data;
+};
+
+export const verifyMembershipPurchase = async (verifyData) => {
+  const response = await api.post('/memberships/verify', verifyData);
+  return response.data;
+};

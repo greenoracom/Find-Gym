@@ -64,4 +64,14 @@ export const getPublicTrainerById = async (id) => {
   return response.data;
 };
 
+export const initiateBooking = async (bookingData) => {
+  const response = await api.post('/bookings/initiate', bookingData);
+  return response.data;
+};
+
+export const verifyBookingPayment = async (paymentData) => {
+  const response = await api.post('/bookings/verify', paymentData);
+  return response.data;
+};
+
 export default api;

@@ -32,7 +32,7 @@ const GymsList = () => {
             id: g._id,
             name: g.name,
             city: g.location?.city || 'N/A',
-            owner: g.ownerId?.name || 'N/A',
+            owner: g.ownerId?.name || '',
             members: g.currentMembers || 0,
             revenue: g.monthlyRevenue ? `₹${g.monthlyRevenue}` : '₹0',
             status: status,
@@ -126,9 +126,9 @@ const GymsList = () => {
   ];
 
   const filteredGyms = gyms.filter(gym => 
-    gym.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gym.owner?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gym.city?.toLowerCase().includes(searchTerm.toLowerCase())
+    (gym.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (gym.owner || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (gym.city || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {

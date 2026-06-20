@@ -59,8 +59,9 @@ const TrainersList = () => {
       title: 'Verification', 
       key: 'status',
       render: (row) => {
-        const variants = { 'Approved': 'success', 'Pending': 'warning', 'Rejected': 'danger', 'Active': 'success' };
-        return <Badge label={row.status} variant={variants[row.status] || 'default'} />;
+        const variants = { 'Approved': 'success', 'Pending': 'warning', 'Rejected': 'danger', 'Active': 'success', 'Blocked': 'danger', 'Suspended': 'danger' };
+        const label = row.status === 'Blocked' ? 'Blocked' : row.status;
+        return <Badge label={label} variant={variants[row.status] || 'default'} />;
       }
     },
     { 
@@ -71,13 +72,41 @@ const TrainersList = () => {
     { 
       title: 'Actions', 
       key: 'actions',
-      render: (row) => (
-        <div className="flex gap-2">
-           <Button variant="secondary" size="sm">View</Button>
-        </div>
-      )
+      render: (row) => {
+        const handleToggleStatus = async () => {
+          const newStatus = row.status === 'Active' || row.status === 'Approved' ? 'blocked' : 'active';
+          if (!window.confirm(`Are you sure you want to ${newStatus === 'active' ? 'activate' : 'suspend'} this trainer?`)) return;
+          try {
+            const { updateTrainerStatus } = await import('../../../../services/superApi');
+            const response = await updateTrainerStatus(row.id, newStatus);
+            if (response.data && response.data.success) {
+              fetchTrainers();
+            } else {
+              alert('Failed to update status.');
+            }
+          } catch (error) {
+            console.error(error);
+            alert('Failed to update status.');
+          }
+        };
+
+        const handleView = () => {
+          setSelectedTrainerForModal(row);
+        };
+
+        return (
+          <div className="flex gap-2">
+             <Button variant="secondary" size="sm" onClick={handleView}>View</Button>
+             <Button variant="secondary" size="sm" className="text-red-500" onClick={handleToggleStatus}>
+               {row.status === 'Active' || row.status === 'Approved' ? 'Suspend' : 'Activate'}
+             </Button>
+          </div>
+        );
+      }
     },
   ];
+
+  const [selectedTrainerForModal, setSelectedTrainerForModal] = useState(null);
 
   const filteredTrainers = trainers.filter(trainer => 
     trainer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -116,6 +145,24 @@ const TrainersList = () => {
         </div>
         <Table data={filteredTrainers} columns={columns} />
       </div>
+
+      {selectedTrainerForModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-100 flex flex-col p-6 animate-in zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-slate-900 mb-4">{selectedTrainerForModal.name}'s Profile</h3>
+            <div className="space-y-3 text-left">
+              <div><strong className="text-sm text-gray-500">Email:</strong> <span className="text-gray-900 text-sm font-medium">{selectedTrainerForModal.email}</span></div>
+              <div><strong className="text-sm text-gray-500">Phone:</strong> <span className="text-gray-900 text-sm font-medium">{selectedTrainerForModal.phone}</span></div>
+              <div><strong className="text-sm text-gray-500">Associated Gym:</strong> <span className="text-gray-900 text-sm font-medium">{selectedTrainerForModal.gym}</span></div>
+              <div><strong className="text-sm text-gray-500">Rating:</strong> <span className="text-gray-900 text-sm font-medium">★ {selectedTrainerForModal.rating}</span></div>
+              <div><strong className="text-sm text-gray-500">Status:</strong> <span className="text-gray-900 text-sm font-medium">{selectedTrainerForModal.status}</span></div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button variant="secondary" onClick={() => setSelectedTrainerForModal(null)}>Close</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

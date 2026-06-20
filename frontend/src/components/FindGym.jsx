@@ -153,6 +153,22 @@ const FindGym = () => {
   const satelliteTileLayerRef = useRef(null);
   const routePolylineRef = useRef(null);
 
+
+  const handleShareGym = (gym) => {
+    if (!gym) return;
+    const gymLink = `${window.location.origin}/gym-details?id=${gym._id || gym.id}`;
+    const shareText = `📍 *${gym.name}*\n\n🏠 Address: ${gym.location?.address || gym.address?.fullAddress || "Akurdi, Pune"}\n💰 Fee: ₹${getGymMonthlyFee(gym)}/month\n\nCheck out the gym details here:\n${gymLink}`;
+    
+    // Check if the device is a mobile phone
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const whatsappUrl = isMobile 
+      ? `whatsapp://send?text=${encodeURIComponent(shareText)}`
+      : `https://web.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+      
+    window.open(whatsappUrl, "_blank");
+    toast.success("Opening WhatsApp directly...");
+  };
+
   // Helper to parse ratings safely if they are objects (e.g. {average, count}) in database
   const getRatingValue = (val) => {
     if (val && typeof val === "object") {
@@ -628,80 +644,6 @@ const FindGym = () => {
       style={{ fontFamily: "'Roboto', 'Arial', sans-serif" }}
     >
       
-      {/* 1. Thin left vertical toolbar */}
-      <div className="w-[66px] h-full bg-white border-r border-gray-200 flex flex-col items-center py-3 justify-between z-30 select-none flex-shrink-0">
-        <div className="flex flex-col items-center gap-6 w-full">
-          {/* Hamburger Menu */}
-          <button className="text-gray-600 hover:text-gray-900 transition-colors p-2.5 rounded-full hover:bg-gray-100 cursor-pointer">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-          </button>
-
-          {/* Ask Maps (Compass icon with blue style) */}
-          <button className="flex flex-col items-center gap-1 group cursor-pointer w-full text-center">
-            <div className="w-[42px] h-[42px] rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#1a73e8] group-hover:bg-blue-100/70 transition-all shadow-sm">
-              <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-.778.099-1.533.284-2.253" />
-              </svg>
-            </div>
-            <span className="text-[9.5px] font-bold text-[#1a73e8] tracking-tight">Ask Maps</span>
-          </button>
-
-          {/* Saved */}
-          <button className="flex flex-col items-center gap-1 group cursor-pointer w-full text-center">
-            <div className="w-[34px] h-[34px] flex items-center justify-center text-gray-500 group-hover:text-gray-800 transition-colors">
-              <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0z" />
-              </svg>
-            </div>
-            <span className="text-[9.5px] font-semibold text-gray-500 tracking-tight">Saved</span>
-          </button>
-
-          {/* Recents */}
-          <button className="flex flex-col items-center gap-1 group cursor-pointer w-full text-center">
-            <div className="w-[34px] h-[34px] flex items-center justify-center text-gray-500 group-hover:text-gray-800 transition-colors">
-              <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
-              </svg>
-            </div>
-            <span className="text-[9.5px] font-semibold text-gray-500 tracking-tight">Recents</span>
-          </button>
-
-          {/* Momentum / 5 min City preview */}
-          <button className="flex flex-col items-center gap-1 group cursor-pointer w-full text-center">
-            <div className="w-[34px] h-[34px] rounded-lg bg-[#e0f7fa] flex items-center justify-center text-[#00838f] group-hover:bg-[#b2ebf2] transition-colors border border-[#80deea]">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
-              </svg>
-            </div>
-            <span className="text-[9px] font-semibold text-gray-500 tracking-tight truncate max-w-[58px]">MOMEN...<br/>5 min</span>
-          </button>
-
-          {/* View more */}
-          <button className="flex flex-col items-center gap-1 group cursor-pointer w-full text-center">
-            <div className="w-[34px] h-[34px] flex items-center justify-center text-gray-500 group-hover:text-gray-800 transition-colors">
-              <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-                <circle cx="6" cy="12" r="1.5" fill="currentColor" />
-                <circle cx="18" cy="12" r="1.5" fill="currentColor" />
-              </svg>
-            </div>
-            <span className="text-[9.5px] font-semibold text-gray-500 tracking-tight">View more</span>
-          </button>
-        </div>
-
-        {/* Get app at bottom */}
-        <button className="flex flex-col items-center gap-1 group cursor-pointer w-full text-center mt-auto">
-          <div className="w-[34px] h-[34px] flex items-center justify-center text-gray-500 group-hover:text-gray-800 transition-colors">
-            <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
-            </svg>
-          </div>
-          <span className="text-[9.5px] font-semibold text-gray-500 tracking-tight">Get app</span>
-        </button>
-      </div>
-
       {/* 2. Main sidebar/detail card overlay */}
       <div className={`h-full bg-white border-r border-gray-200 shadow-xl flex flex-col z-20 flex-shrink-0 relative transition-all duration-300 ${
         isSidebarOpen ? "w-[390px]" : "w-0 overflow-hidden border-r-0 shadow-none"
@@ -1150,7 +1092,7 @@ const FindGym = () => {
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         className="hidden md:flex absolute top-1/2 -translate-y-1/2 z-30 bg-white border border-gray-200 shadow-md hover:shadow-lg rounded-r-md py-4 px-1 cursor-pointer transition-all duration-300 items-center justify-center w-[20px] h-[48px]"
-        style={{ left: isSidebarOpen ? "456px" : "66px" }}
+        style={{ left: isSidebarOpen ? "390px" : "0px" }}
         title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
       >
         <span className="text-[10px] font-extrabold text-gray-500 hover:text-gray-800">
@@ -1267,7 +1209,10 @@ const FindGym = () => {
                       <span className="text-[10px] font-bold text-[#1a73e8] group-hover:underline leading-tight text-center">View Website</span>
                     </button>
 
-                    <button className="flex flex-col items-center gap-1.5 group w-[64px] cursor-pointer">
+                    <button 
+                      onClick={() => handleShareGym(selectedGymDetail)}
+                      className="flex flex-col items-center gap-1.5 group w-[64px] cursor-pointer"
+                    >
                       <div className="w-[36px] h-[36px] rounded-full bg-[#e0f7fa] hover:bg-[#b2ebf2] flex items-center justify-center text-[#00838f] shadow-sm transition-all">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186l5.572 3.251m-5.572-3.251l5.56-3.248a2.25 2.25 0 1 1 3.06 3.19l-5.56 3.248m5.57 1.09a2.25 2.25 0 1 1-3.136 3.062l-5.572-3.251" />

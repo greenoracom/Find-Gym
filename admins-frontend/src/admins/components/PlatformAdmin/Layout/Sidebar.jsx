@@ -9,6 +9,7 @@ const Sidebar = () => {
 
   const navItems = [
     { name: 'Dashboard', path: '/platform-admin/dashboard', icon: '📊' },
+    { name: 'City Admins', path: '/platform-admin/city-admins', icon: '🏙️' },
     { name: 'Users', path: '/platform-admin/users', icon: '👥' },
     { name: 'Gyms', path: '/platform-admin/gyms', icon: '🏢' },
     { name: 'Gym Owners', path: '/platform-admin/gym-owners', icon: '💼' },
@@ -20,7 +21,7 @@ const Sidebar = () => {
     <aside className="w-64 bg-slate-900 text-white min-h-screen flex flex-col shadow-lg transition-all duration-300">
       <div className="p-6 border-b border-slate-700 flex items-center justify-center">
         <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-600">
-          Find Gym Admin
+          LifeCell.Fitness Admin
         </h1>
       </div>
       <nav className="flex-1 px-4 py-6 space-y-2">

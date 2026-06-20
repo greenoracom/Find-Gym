@@ -1,7 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { getGymById } from '../userServices/gymApi';
+import { getGymById, initiateMembershipPurchase, verifyMembershipPurchase } from '../userServices/gymApi';
 import toast from 'react-hot-toast';
+
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -45,6 +59,84 @@ const GymDetails = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState('About');
+  const [purchaseLoading, setPurchaseLoading] = useState(false);
+
+  const handleJoinNow = async (planTitle, price, duration) => {
+    const userToken = localStorage.getItem('userToken') || localStorage.getItem('token');
+    if (!userToken) {
+      toast.error('Please login first to join a membership plan.');
+      navigate('/login');
+      return;
+    }
+
+    setPurchaseLoading(true);
+    try {
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        toast.error('Razorpay SDK failed to load. Are you online?');
+        setPurchaseLoading(false);
+        return;
+      }
+
+      const initiateRes = await initiateMembershipPurchase({
+        gymId,
+        planTitle,
+        pricePaid: price,
+        duration
+      });
+
+      if (!initiateRes.success) {
+        toast.error(initiateRes.message || 'Failed to initiate purchase');
+        setPurchaseLoading(false);
+        return;
+      }
+
+      const options = {
+        key: initiateRes.key,
+        amount: initiateRes.amount,
+        currency: initiateRes.currency,
+        name: gym.name,
+        description: `Membership - ${planTitle}`,
+        order_id: initiateRes.orderId,
+        handler: async (response) => {
+          try {
+            await verifyMembershipPurchase({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            });
+            toast.success(`Welcome to ${gym.name}! Membership is now active! 🎉`, {
+              duration: 6000,
+              icon: '💪'
+            });
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          } catch (err) {
+            console.error("Verification failed:", err);
+            toast.error("Payment verified locally, but backend sync failed.");
+          }
+        },
+        prefill: {
+          name: '',
+          email: '',
+          contact: ''
+        },
+        theme: {
+          color: '#FF7A00'
+        }
+      };
+
+      const rzpInstance = new window.Razorpay(options);
+      rzpInstance.open();
+
+    } catch (err) {
+      console.error("Purchase error:", err);
+      toast.error(err?.response?.data?.message || 'Failed to process membership purchase.');
+    } finally {
+      setPurchaseLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!gymId) {
@@ -429,8 +521,12 @@ const GymDetails = () => {
             <span>Free Trial Available</span>
           </div>
 
-          <button className="w-full py-3 bg-orange-600 hover:bg-orange-500 active:scale-95 text-white font-extrabold rounded-xl transition-all cursor-pointer text-xs uppercase tracking-wider mb-2.5 shadow-lg shadow-orange-600/10">
-            Join Now
+          <button 
+            onClick={() => handleJoinNow('Monthly Fitness Plan', monthlyFee, '1 Month')}
+            disabled={purchaseLoading}
+            className="w-full py-3 bg-orange-600 hover:bg-orange-500 active:scale-95 text-white font-extrabold rounded-xl transition-all cursor-pointer text-xs uppercase tracking-wider mb-2.5 shadow-lg shadow-orange-600/10 disabled:opacity-50"
+          >
+            {purchaseLoading ? 'Processing...' : 'Join Now'}
           </button>
 
           <button className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-850 active:scale-95 text-white font-extrabold rounded-xl transition-all cursor-pointer text-xs uppercase tracking-wider mb-5">
@@ -719,8 +815,12 @@ const GymDetails = () => {
                   <p className="text-green-500 text-[11px] font-bold mt-1">Save ₹{p.saving.toLocaleString()}</p>
                 )}
               </div>
-              <button className="w-full mt-6 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-extrabold rounded-lg text-xs uppercase transition-colors cursor-pointer">
-                Join Now
+              <button 
+                onClick={() => handleJoinNow(p.title, p.price, p.duration || p.validity)}
+                disabled={purchaseLoading}
+                className="w-full mt-6 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-extrabold rounded-lg text-xs uppercase transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {purchaseLoading ? 'Processing...' : 'Join Now'}
               </button>
             </motion.div>
           ))}
