@@ -388,7 +388,7 @@ const Dashboard = () => {
               </button>
               <button
                 onClick={() => { setSelectedOrder(null); navigate('/health-store-owner/orders'); }}
-                className="px-5 py-2.5 bg-red-650 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer border-0 shadow-md"
+                className="px-5 py-2.5 bg-[#B91C1C] hover:bg-[#991B1B] text-white font-bold text-xs rounded-xl transition-all cursor-pointer border-0 shadow-md"
               >
                 Manage Status &rarr;
               </button>

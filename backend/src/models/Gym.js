@@ -85,7 +85,13 @@ const gymSchema = new mongoose.Schema({
       name: { type: String },
       photo: { type: String },
       experience: { type: String },
-      specialization: { type: String }
+      specialization: { type: String },
+      bio: { type: String },
+      skills: { type: [String], default: [] },
+      instagramLink: { type: String },
+      certification: { type: String },
+      availability: { type: String },
+      trainingType: { type: String }
     }
   ],
   about: { type: String },

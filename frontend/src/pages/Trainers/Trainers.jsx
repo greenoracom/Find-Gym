@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getPublicTrainers } from "../../userServices/trainerApi";
+import fitnessCoachBanner from "../../assets/fitness_coach_banner.png";
+import gymBackgroundHero from "../../assets/gym_background_hero.png";
 
 const STATIC_TRAINERS = [
   {
@@ -175,13 +177,12 @@ function Stars({ count = 5, size = 12 }) {
 /* ──────────────────────────────────────────────────
    HERO
 ────────────────────────────────────────────────── */
-function Hero() {
+function Hero({ searchQuery, setSearchQuery }) {
   return (
     <section
-      className="relative min-h-[70vh] flex items-center overflow-hidden pt-[68px]"
+      className="relative min-h-[70vh] flex items-center overflow-hidden pt-[68px] animate-fade-in"
       style={{
-        background:
-          "linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 55%, rgba(0,0,0,0.3) 100%), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1400&q=80&fit=crop') center/cover no-repeat",
+        background: `linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0.4) 100%), url(${gymBackgroundHero}) center/cover no-repeat`,
       }}
     >
       {/* Orange radial glow */}
@@ -189,43 +190,88 @@ function Hero() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 65% 80% at 12% 50%, rgba(255,122,0,0.08) 0%, transparent 65%)",
+            "radial-gradient(ellipse 65% 80% at 12% 50%, rgba(255,122,0,0.1) 0%, transparent 65%)",
         }}
       />
 
       <div className="relative z-10 w-full max-w-[1300px] mx-auto px-10 grid grid-cols-2 items-center gap-8 min-h-[calc(70vh-68px)] py-16 max-lg:grid-cols-1 max-lg:text-center max-lg:py-14 max-md:px-5">
 
         {/* ── Left ── */}
-        <div className="flex flex-col gap-4 max-lg:items-center">
-          <p className="text-[0.72rem] font-bold tracking-[0.18em] uppercase text-[#FF7A00]">
-            Our Trainers
-          </p>
+        <div className="flex flex-col gap-5 max-lg:items-center">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-[#FF7A00]/30 backdrop-blur-md self-start max-lg:self-center shadow-[0_4px_20px_rgba(255,122,0,0.05)] animate-fade-in-up">
+            <span className="w-2 h-2 rounded-full bg-[#FF7A00] animate-pulse shadow-[0_0_8px_#FF7A00]" />
+            <span className="text-[0.68rem] font-black tracking-[0.2em] uppercase text-[#FF7A00]">
+              Our Elite Trainers
+            </span>
+          </div>
 
-          <h1 className="leading-[1.03] font-black">
-            <span className="block text-3xl font-extrabold text-white max-md:text-2xl">
+          <h1 className="leading-[1.05] font-black tracking-tight animate-fade-in-up delay-1">
+            <span className="block text-3xl font-extrabold text-white/90 max-md:text-2xl">
               Find Your Perfect
             </span>
             <span
-              className="block text-[5rem] font-black leading-tight max-lg:text-[3.5rem] max-md:text-[2.8rem]"
+              className="block text-[4.8rem] font-extrabold leading-tight max-lg:text-[3.5rem] max-md:text-[2.8rem] bg-gradient-to-r from-[#FF9F43] to-[#FF5E3A] bg-clip-text text-transparent"
               style={{
-                color: "#FF7A00",
-                textShadow: "0 0 40px rgba(255,122,0,0.35)",
+                filter: "drop-shadow(0 2px 20px rgba(255,122,0,0.2))",
               }}
             >
               Fitness Coach
             </span>
           </h1>
 
-          <p className="text-[0.95rem] text-white/60 leading-[1.7] max-w-[420px]">
-            Certified trainers for weight loss, muscle gain, yoga and personal training.
-          </p>
+          <div className="flex flex-col gap-4 animate-fade-in-up delay-2">
+            <p className="text-[0.98rem] text-white/65 leading-relaxed max-w-[460px] max-lg:mx-auto">
+              Transform your body and mind with elite, certified fitness coaches tailored to your personal goals.
+            </p>
+
+            <div className="flex flex-wrap gap-x-4 gap-y-2 max-lg:justify-center">
+              <span className="flex items-center gap-1.5 text-[0.78rem] text-white/80 font-medium">
+                <span className="text-[#FF7A00] font-bold">✓</span> Personal Training
+              </span>
+              <span className="flex items-center gap-1.5 text-[0.78rem] text-white/80 font-medium">
+                <span className="text-[#FF7A00] font-bold">✓</span> Custom Diet Plans
+              </span>
+              <span className="flex items-center gap-1.5 text-[0.78rem] text-white/80 font-medium">
+                <span className="text-[#FF7A00] font-bold">✓</span> Live Progress Tracking
+              </span>
+            </div>
+          </div>
+
+          {/* Premium Search Input */}
+          <div className="relative mt-3 w-full max-w-[460px] flex items-center bg-[rgba(20,20,20,0.7)] border border-white/10 rounded-2xl p-1.5 backdrop-blur-xl focus-within:border-[#FF7A00]/50 transition-all duration-300 shadow-[0_10px_35px_rgba(0,0,0,0.4)] animate-fade-in-up delay-3">
+            <div className="pl-3.5 text-white/40">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name, specialty, or location..."
+              className="w-full bg-transparent text-[0.88rem] text-white placeholder-white/40 pl-2.5 outline-none border-none py-2"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="pr-2 text-white/40 hover:text-white transition-colors bg-transparent border-none outline-none cursor-pointer"
+              >
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+            <button className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#FF7A00] to-[#FF5E3A] hover:opacity-95 text-white text-[0.78rem] font-extrabold hover:shadow-[0_0_18px_rgba(255,122,0,0.35)] transition-all cursor-pointer whitespace-nowrap border-none">
+              Find Coach
+            </button>
+          </div>
         </div>
 
         {/* ── Right ── */}
-        <div className="flex justify-end items-center max-lg:justify-center">
+        <div className="flex justify-end items-center max-lg:justify-center animate-fade-in-right delay-2">
           <div className="relative w-[370px] h-[470px] max-md:w-[270px] max-md:h-[340px]">
             <img
-              src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=700&fit=crop&crop=top&q=85"
+              src={fitnessCoachBanner}
               alt="Fitness trainer"
               className="w-full h-full object-cover object-top rounded-[22px] border border-[#FF7A00]/18 shadow-[0_20px_60px_rgba(0,0,0,0.7),0_0_50px_rgba(255,122,0,0.07)]"
             />
@@ -246,7 +292,46 @@ function Hero() {
               </span>
             </div>
 
-            <style>{`@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}`}</style>
+            <style>{`
+              @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+              @keyframes fadeInUp {
+                from {
+                  opacity: 0;
+                  transform: translateY(30px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+              @keyframes fadeInRight {
+                from {
+                  opacity: 0;
+                  transform: translateX(35px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateX(0);
+                }
+              }
+              @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+              }
+              .animate-fade-in-up {
+                animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+              }
+              .animate-fade-in-right {
+                animation: fadeInRight 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+              }
+              .animate-fade-in {
+                animation: fadeIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+              }
+              .delay-1 { animation-delay: 120ms; }
+              .delay-2 { animation-delay: 240ms; }
+              .delay-3 { animation-delay: 360ms; }
+              .delay-4 { animation-delay: 480ms; }
+            `}</style>
           </div>
         </div>
       </div>
@@ -415,11 +500,11 @@ function TrainerDetail({ trainer, onBack }) {
   const priceVal = trainer.pricePerSession || trainer.price || 0;
   const languagesText = Array.isArray(trainer.languages) ? trainer.languages.join(', ') : (trainer.languages || 'English, Hindi');
   const bioText = trainer.bio || trainer.about || 'Certified professional trainer helping clients reach their fitness goals.';
-  
-  const availabilityDays = Array.isArray(trainer.availability) 
-    ? trainer.availability 
+
+  const availabilityDays = Array.isArray(trainer.availability)
+    ? trainer.availability
     : (trainer.availability?.days || []);
-    
+
   const timeSlotsText = trainer.timeSlot || (trainer.availability?.timeSlots && trainer.availability.timeSlots.length > 0 ? trainer.availability.timeSlots.join(', ') : 'Not specified');
 
   return (
@@ -581,11 +666,10 @@ function TrainerDetail({ trainer, onBack }) {
                 return (
                   <div
                     key={day}
-                    className={`flex flex-col items-center gap-1 px-2.5 py-2 rounded-xl border min-w-[44px] transition-colors ${
-                      on
+                    className={`flex flex-col items-center gap-1 px-2.5 py-2 rounded-xl border min-w-[44px] transition-colors ${on
                         ? "border-[#FF7A00]/25 bg-[#FF7A00]/08"
                         : "border-white/[0.07] bg-white/[0.03]"
-                    }`}
+                      }`}
                   >
                     <span className={`text-[0.6rem] font-bold uppercase tracking-wide ${on ? "text-[#FF7A00]" : "text-white/30"}`}>
                       {day}
@@ -721,6 +805,7 @@ const Trainers = () => {
   const [loading, setLoading] = useState(true);
   const [selectedTrainer, setSelectedTrainer] = useState(null);
   const [favs, setFavs] = useState(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchTrainers = async () => {
@@ -743,20 +828,31 @@ const Trainers = () => {
   }, []);
 
   const filtered = trainers.filter((t) => {
+    // 1. Search Query Filter
+    const matchesSearch = searchQuery
+      ? t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (t.speciality && t.speciality.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (t.specializations || []).some(s => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (t.city || t.location || "").toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+
+    if (!matchesSearch) return false;
+
+    // 2. Category Filter
     if (activeFilter === "All") return true;
-    
+
     const specs = (t.specializations || []).map(s => s.toLowerCase());
     const filterLower = activeFilter.toLowerCase();
-    
+
     if (activeFilter === "Personal Trainer") {
       const types = (t.trainingTypes || []).map(ty => ty.toLowerCase());
       return types.includes("personal training") || (t.category && t.category.toLowerCase() === "personal trainer");
     }
-    
-    return specs.includes(filterLower) || 
-           (t.category && t.category.toLowerCase() === filterLower) ||
-           (filterLower === "strength" && specs.some(s => s.includes("strength") || s.includes("weight"))) ||
-           (filterLower === "weight loss" && specs.some(s => s.includes("loss") || s.includes("fat")));
+
+    return specs.includes(filterLower) ||
+      (t.category && t.category.toLowerCase() === filterLower) ||
+      (filterLower === "strength" && specs.some(s => s.includes("strength") || s.includes("weight"))) ||
+      (filterLower === "weight loss" && specs.some(s => s.includes("loss") || s.includes("fat")));
   });
 
   const toggleFav = (id) => {
@@ -779,13 +875,15 @@ const Trainers = () => {
     <div className="min-h-screen bg-[#0d0d0d] text-white font-['Inter',sans-serif] overflow-x-hidden">
 
       {/* HERO */}
-      <Hero />
+      <Hero searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
       {/* FILTER */}
-      <FilterBar active={activeFilter} setActive={setActiveFilter} />
+      <div className="animate-fade-in-up delay-3">
+        <FilterBar active={activeFilter} setActive={setActiveFilter} />
+      </div>
 
       {/* CARDS GRID */}
-      <div className="max-w-[1300px] mx-auto px-10 py-6 max-md:px-4">
+      <div className="max-w-[1300px] mx-auto px-10 py-6 max-md:px-4 animate-fade-in-up delay-4">
         {loading ? (
           <div className="text-center py-12 text-white/50">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#FF7A00]" />

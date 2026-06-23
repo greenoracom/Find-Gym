@@ -89,11 +89,11 @@ const TrainerProfile = () => {
     const allowedDays = Array.isArray(trainerObj?.availability)
       ? trainerObj.availability
       : trainerObj?.availability?.days || [];
-    
+
     if (allowedDays.length === 0) {
       return new Date().toISOString().split('T')[0];
     }
-    
+
     const today = new Date();
     // Look up to 30 days ahead to find matching availability day
     for (let i = 0; i < 30; i++) {
@@ -674,16 +674,14 @@ const TrainerProfile = () => {
                   return (
                     <div
                       key={day}
-                      className={`flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border min-w-[48px] transition-colors ${
-                        on
+                      className={`flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border min-w-[48px] transition-colors ${on
                           ? 'border-[#FF7A00]/30 bg-[#FF7A00]/10'
                           : 'border-white/[0.07] bg-white/[0.03]'
-                      }`}
+                        }`}
                     >
                       <span
-                        className={`text-[0.6rem] font-bold uppercase tracking-wide ${
-                          on ? 'text-[#FF7A00]' : 'text-white/25'
-                        }`}
+                        className={`text-[0.6rem] font-bold uppercase tracking-wide ${on ? 'text-[#FF7A00]' : 'text-white/25'
+                          }`}
                       >
                         {day}
                       </span>
@@ -841,11 +839,10 @@ const TrainerProfile = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => setSelectedPlan('Session')}
-                      className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer ${
-                        selectedPlan === 'Session'
+                      className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer ${selectedPlan === 'Session'
                           ? 'border-[#FF7A00]/50 bg-[#FF7A00]/10 text-white'
                           : 'border-zinc-800 bg-zinc-950/50 text-zinc-400 hover:text-white'
-                      }`}
+                        }`}
                     >
                       <span className="text-xs font-bold">Per Session</span>
                       <span className="text-sm font-black text-[#FF7A00] mt-1">₹{priceVal}</span>
@@ -854,11 +851,10 @@ const TrainerProfile = () => {
                     {priceMonth && (
                       <button
                         onClick={() => setSelectedPlan('Monthly')}
-                        className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer ${
-                          selectedPlan === 'Monthly'
+                        className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer ${selectedPlan === 'Monthly'
                             ? 'border-[#FF7A00]/50 bg-[#FF7A00]/10 text-white'
                             : 'border-zinc-800 bg-zinc-950/50 text-zinc-400 hover:text-white'
-                        }`}
+                          }`}
                       >
                         <span className="text-xs font-bold">Monthly Plan</span>
                         <span className="text-sm font-black text-[#FF7A00] mt-1">₹{priceMonth}</span>
@@ -933,3 +929,4 @@ const TrainerProfile = () => {
 };
 
 export default TrainerProfile;
+

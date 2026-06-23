@@ -620,7 +620,7 @@ const GymDetails = () => {
                   }`}
               >
                 {tab.icon(iconColor)}
-                <span>{tab.id}</span>
+                <span className="text-[9.5px] font-bold uppercase tracking-wider mt-1">{tab.id}</span>
               </button>
             );
           })}
@@ -628,70 +628,237 @@ const GymDetails = () => {
       </motion.div>
 
       {/* 4. About FITNESS18 Section */}
-      <div id="about" className="max-w-6xl mx-auto px-4 md:px-8 mt-12 text-left">
+      <div id="about" className="max-w-[1380px] mx-auto px-4 md:px-8 mt-12 text-left">
         <motion.div
           variants={fadeInUp}
           initial="initial"
           whileInView="whileInView"
           viewport={{ once: true, margin: "-60px" }}
-          className="bg-[#121214]/45 border border-zinc-900 rounded-3xl p-6 md:p-8 hover:border-orange-500/10 transition-colors shadow-xl"
+          className="bg-[#0b0c0e] border border-zinc-900 rounded-[2.5rem] p-6 md:p-10 shadow-2xl"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-            {/* Left Text details */}
-            <div className="lg:col-span-5 flex flex-col gap-5">
-              <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-white border-l-4 border-orange-500 pl-3">
-                About {gym.name}
+            {/* Left Column */}
+            <div className="lg:col-span-5 flex flex-col">
+              <div className="flex">
+                <span className="bg-[#ff7a00] text-white text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-sm relative transform -skew-x-12">
+                  ABOUT US
+                </span>
+              </div>
+
+              <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white uppercase mt-5 leading-tight">
+                ABOUT <span className="text-[#ff7a00]">{gym.name}</span>
               </h2>
-              <p className="text-zinc-400 text-sm md:text-[14.5px] leading-relaxed">
-                {gym.about || gym.description || `${gym.name} is a premium fitness destination equipped with state-of-the-art equipment, expert trainers and personalized fitness programs to help you achieve your goals.`}
+
+              <p className="text-zinc-400 text-xs md:text-sm leading-relaxed mt-4">
+                {gym.about || gym.description || `${gym.name} is a premium fitness gym with modern equipment, certified trainers, cardio zone, strength training, personal training, diet guidance, and flexible membership plans.`}
               </p>
 
-              {/* Orange highlights row */}
-              <div className="flex gap-8 mt-3 text-left">
-                <div>
-                  <p className="text-2xl font-black text-orange-500 flex items-center gap-1.5">
-                    <span className="text-[18px]">👥</span> 5000+
-                  </p>
-                  <p className="text-zinc-555 text-[10px] font-bold uppercase tracking-wide mt-0.5">Members</p>
+              {/* Statistics Row */}
+              <div className="grid grid-cols-4 gap-2 py-6 border-y border-zinc-900/60 my-5">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <span className="text-base text-[#ff7a00] mb-1">👥</span>
+                  <span className="text-lg md:text-xl font-black text-white">5000+</span>
+                  <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider mt-0.5">Members</span>
                 </div>
-                <div>
-                  <p className="text-2xl font-black text-orange-500 flex items-center gap-1.5">
-                    <span className="text-[18px]">🏋️</span> 15+
-                  </p>
-                  <p className="text-zinc-555 text-[10px] font-bold uppercase tracking-wide mt-0.5">Trainers</p>
+                <div className="flex flex-col items-center justify-center text-center border-l border-zinc-900/60">
+                  <span className="text-base text-[#ff7a00] mb-1">🏋️</span>
+                  <span className="text-lg md:text-xl font-black text-white">15+</span>
+                  <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider mt-0.5">Trainers</span>
                 </div>
-                <div>
-                  <p className="text-2xl font-black text-orange-500 flex items-center gap-1.5">
-                    <span className="text-[18px]">📅</span> 8+
-                  </p>
-                  <p className="text-zinc-555 text-[10px] font-bold uppercase tracking-wide mt-0.5">Years</p>
+                <div className="flex flex-col items-center justify-center text-center border-l border-zinc-900/60">
+                  <span className="text-base text-[#ff7a00] mb-1">📅</span>
+                  <span className="text-lg md:text-xl font-black text-white">8+</span>
+                  <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider mt-0.5">Years</span>
                 </div>
+                <div className="flex flex-col items-center justify-center text-center border-l border-zinc-900/60">
+                  <span className="text-base text-[#ff7a00] mb-1">⭐</span>
+                  <span className="text-lg md:text-xl font-black text-white">{ratingVal}/5</span>
+                  <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider mt-0.5">Ratings</span>
+                </div>
+              </div>
+
+              {/* Features Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#ff7a00]/10 border border-[#ff7a00]/20 flex items-center justify-center text-[#ff7a00] text-sm flex-shrink-0">
+                    🏋️
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-xs text-white">Modern Equipment</h4>
+                    <p className="text-[10px] text-zinc-400 mt-0.5 leading-relaxed">Train with the latest high-quality equipment for the best results.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#ff7a00]/10 border border-[#ff7a00]/20 flex items-center justify-center text-[#ff7a00] text-sm flex-shrink-0">
+                    👥
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-xs text-white">Certified Trainers</h4>
+                    <p className="text-[10px] text-zinc-400 mt-0.5 leading-relaxed">Expert & certified trainers to guide, motivate and transform you.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#ff7a00]/10 border border-[#ff7a00]/20 flex items-center justify-center text-[#ff7a00] text-sm flex-shrink-0">
+                    ⚡
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-xs text-white">Cardio Zone</h4>
+                    <p className="text-[10px] text-zinc-400 mt-0.5 leading-relaxed">Advanced cardio machines to improve your endurance.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#ff7a00]/10 border border-[#ff7a00]/20 flex items-center justify-center text-[#ff7a00] text-sm flex-shrink-0">
+                    🍎
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-xs text-white">Diet Guidance</h4>
+                    <p className="text-[10px] text-zinc-400 mt-0.5 leading-relaxed">Personalized diet plans to fuel your body and achieve goals.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Buttons */}
+              <div className="flex gap-4 mt-8">
+                <button
+                  onClick={() => {
+                    const plansEl = document.getElementById('plans');
+                    if (plansEl) plansEl.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3.5 bg-[#ff7a00] hover:bg-[#e06b00] text-white text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 shadow-lg shadow-orange-600/10 cursor-pointer"
+                >
+                  <span>JOIN NOW</span>
+                  <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-white text-[9px]">➔</span>
+                </button>
+                <button
+                  onClick={() => {
+                    const plansEl = document.getElementById('plans');
+                    if (plansEl) plansEl.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3.5 bg-transparent border border-zinc-800 hover:border-zinc-700 text-white text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 cursor-pointer"
+                >
+                  <span>EXPLORE PLANS</span>
+                  <span className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-white text-[9px]">➔</span>
+                </button>
               </div>
             </div>
 
-            {/* Right Photos grid (4 thumbnails side-by-side) */}
-            <div id="gallery" className="lg:col-span-7 flex flex-col gap-4">
-              <div className="grid grid-cols-4 gap-3">
-                {slideshowImages.map((imgUrl, i) => (
-                  <div
-                    key={i}
-                    onClick={() => setCurrentSlide(i)}
-                    className={`aspect-[3/4] rounded-2xl overflow-hidden border group cursor-pointer shadow-md transition-all duration-300 relative ${currentSlide === i ? 'border-orange-500 scale-95 shadow-[0_0_15px_rgba(249,115,22,0.3)]' : 'border-zinc-800 hover:border-orange-500/50'
-                      }`}
-                  >
-                    <img
-                      src={imgUrl}
-                      alt={`Thumb ${i + 1}`}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    {i === slideshowImages.length - 1 && (
-                      <div className="absolute inset-0 bg-black/65 flex items-center justify-center p-2 text-center text-[10px] font-extrabold uppercase tracking-wider text-white">
-                        View All Photos
-                      </div>
-                    )}
+            {/* Right Column - Photos & Feature Cards Grid */}
+            <div id="gallery" className="lg:col-span-7 grid grid-cols-6 gap-4">
+
+              {/* Card 1: Our Gym */}
+              <div className="col-span-6 sm:col-span-2 relative aspect-[3/3.8] rounded-3xl overflow-hidden group border border-zinc-900">
+                <img
+                  src={slideshowImages[0]}
+                  alt="Our Gym"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#ff7a00] flex items-center justify-center text-white text-xs flex-shrink-0 shadow-lg">
+                    📷
                   </div>
-                ))}
+                  <div>
+                    <h4 className="text-[10px] font-black text-white uppercase tracking-wider">OUR GYM</h4>
+                    <p className="text-[8px] text-zinc-300 font-medium">State-of-the-art infrastructure</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2: Expert Trainers */}
+              <div className="col-span-6 sm:col-span-2 relative aspect-[3/3.8] rounded-3xl overflow-hidden group border border-zinc-900">
+                <img
+                  src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=300&auto=format&fit=crop"
+                  alt="Expert Trainers"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#ff7a00] flex items-center justify-center text-white text-xs flex-shrink-0 shadow-lg">
+                    👥
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black text-white uppercase tracking-wider">EXPERT TRAINERS</h4>
+                    <p className="text-[8px] text-zinc-300 font-medium">Certified professionals with experience</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3: Diet Plans */}
+              <div className="col-span-6 sm:col-span-2 relative aspect-[3/3.8] rounded-3xl overflow-hidden group border border-zinc-900">
+                <img
+                  src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=300&auto=format&fit=crop"
+                  alt="Diet Plans"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#ff7a00] flex items-center justify-center text-white text-xs flex-shrink-0 shadow-lg">
+                    🍎
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black text-white uppercase tracking-wider">DIET PLANS</h4>
+                    <p className="text-[8px] text-zinc-300 font-medium">Customized nutrition for your goals</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 4: Premium Lockers */}
+              <div className="col-span-6 sm:col-span-3 relative h-[140px] rounded-3xl overflow-hidden group border border-zinc-900">
+                <img
+                  src="https://images.unsplash.com/photo-1564229056182-4f36a3ad8278?q=80&w=400&auto=format&fit=crop"
+                  alt="Premium Lockers"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#ff7a00] flex items-center justify-center text-white text-xs flex-shrink-0 shadow-lg">
+                    🔒
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black text-white uppercase tracking-wider">PREMIUM LOCKERS</h4>
+                    <p className="text-[8px] text-zinc-300 font-medium">Secure & spacious locker rooms</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 5: Ample Parking */}
+              <div className="col-span-6 sm:col-span-3 relative h-[140px] rounded-3xl overflow-hidden group border border-zinc-900">
+                <img
+                  src="https://images.unsplash.com/photo-1506015391300-4802dc74de2e?q=80&w=400&auto=format&fit=crop"
+                  alt="Ample Parking"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#ff7a00] flex items-center justify-center text-white text-xs flex-shrink-0 shadow-lg">
+                    🚗
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black text-white uppercase tracking-wider">AMPLE PARKING</h4>
+                    <p className="text-[8px] text-zinc-300 font-medium">Hassle-free parking for members</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 6: Promo Banner */}
+              <div className="col-span-6 bg-[#121316] border border-zinc-900 rounded-3xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 mt-2">
+                <div className="flex items-center gap-4 text-left">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#ff8c00] to-[#ff5100] flex items-center justify-center text-white text-xl flex-shrink-0 shadow-lg shadow-orange-500/20">
+                    ★
+                  </div>
+                  <div>
+                    <h4 className="text-xs md:text-sm font-black text-white uppercase tracking-wide">YOUR FITNESS JOURNEY STARTS HERE!</h4>
+                    <p className="text-[10px] text-zinc-400 mt-0.5">Join {gym.name} today and become a stronger, healthier version of yourself.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleJoinNow('Monthly Fitness Plan', monthlyFee, '1 Month')}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-[#ff7a00] hover:bg-[#e06b00] text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 shadow-md shadow-orange-600/10 cursor-pointer flex-shrink-0"
+                >
+                  <span>BOOK FREE TRIAL</span>
+                  <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-white text-[8px]">➔</span>
+                </button>
               </div>
             </div>
 
@@ -740,36 +907,96 @@ const GymDetails = () => {
         initial="initial"
         whileInView="whileInView"
         viewport={{ once: true, margin: "-40px" }}
-        className="max-w-6xl mx-auto px-4 md:px-8 mt-14 text-left"
+        className="max-w-[1380px] mx-auto px-6 py-8 md:px-10 md:py-10 mt-14 bg-[#141518] border border-[#222327] rounded-[2rem] text-left shadow-2xl relative"
       >
-        <motion.div variants={fadeInUp} className="flex justify-between items-center mb-6">
-          <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-white border-l-4 border-orange-500 pl-3">
-            Our Trainers
-          </h2>
-          <button className="text-xs font-bold text-orange-500 hover:underline">
-            View All
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div>
+            <p className="text-[10px] md:text-xs font-black uppercase tracking-wider text-[#a3e635] mb-1">
+              OUR EXPERT TRAINERS
+            </p>
+            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white uppercase">
+              Meet Our Trainers
+            </h2>
+          </div>
+          <button 
+            onClick={() => navigate('/trainers')}
+            className="px-6 py-3 bg-transparent border border-[#a3e635] hover:bg-[#a3e635] hover:text-black text-white text-[11px] font-black uppercase tracking-wider rounded-2xl transition-all duration-300 shadow-md"
+          >
+            VIEW ALL TRAINERS
           </button>
-        </motion.div>
+        </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {displayTrainers.map((t, idx) => (
             <motion.div
               key={idx}
               variants={cardScaleUp}
-              className="bg-[#121214]/40 border border-zinc-900 rounded-2xl overflow-hidden text-center flex flex-col items-center hover:border-orange-500/25 transition-all shadow-md group"
+              className="bg-[#1b1c20] border border-[#2d2e35] rounded-3xl p-4 flex flex-col justify-between group hover:border-[#a3e635]/50 transition-all duration-300"
             >
-              <div className="w-full aspect-[4/5] bg-zinc-800 overflow-hidden relative">
-                <img
-                  src={t.photo || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=150&auto=format&fit=crop"}
-                  alt={t.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-              </div>
-              <div className="p-4 flex-grow flex flex-col justify-center">
-                <h4 className="font-extrabold text-sm text-white">{t.name}</h4>
-                <p className="text-zinc-500 text-[10px] font-bold uppercase mt-1 tracking-wider">{t.experience || t.exp}</p>
-                <p className="text-orange-500 text-[10px] font-black uppercase mt-1 tracking-wider">{t.specialization || t.role}</p>
+              <div className="flex flex-col gap-4">
+                <div className="w-full aspect-[4/5] bg-zinc-900 rounded-2xl overflow-hidden relative">
+                  <img
+                    src={t.photo || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=150&auto=format&fit=crop"}
+                    alt={t.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                </div>
+                
+                <div className="pl-4 border-l-2 border-[#a3e635] text-left py-0.5 flex flex-col gap-1">
+                  <h4 className="font-extrabold text-sm text-white tracking-wide">
+                    {t.name}
+                  </h4>
+                  <p className="text-zinc-400 text-[10px] font-medium tracking-wide">
+                    {t.specialization || t.role || "Fitness Expert"}
+                  </p>
+                  
+                  {/* Additional Trainer Info Fields */}
+                  {(t.experience || t.certification) && (
+                    <p className="text-zinc-500 text-[9px] font-bold mt-1">
+                      {t.experience ? `${t.experience} Experience` : ""}
+                      {t.experience && t.certification ? " • " : ""}
+                      {t.certification || ""}
+                    </p>
+                  )}
+
+                  {t.trainingType && (
+                    <p className="text-[#a3e635] text-[9px] font-extrabold uppercase tracking-wider mt-1">
+                      {t.trainingType}
+                    </p>
+                  )}
+
+                  {t.availability && (
+                    <p className="text-zinc-400 text-[9px] mt-0.5 flex items-center gap-1 font-semibold">
+                      <span className="text-[10px] text-[#a3e635]">⏰</span> {t.availability}
+                    </p>
+                  )}
+
+                  {t.bio && (
+                    <p className="text-zinc-400 text-[10px] leading-relaxed mt-1.5 border-t border-zinc-800/80 pt-1.5 italic">
+                      "{t.bio}"
+                    </p>
+                  )}
+                  
+                  {/* Social Icons Row */}
+                  <div className="flex gap-3 mt-3 text-[#a3e635]">
+                    <a href={t.facebookLink || "#"} target="_blank" rel="noreferrer" className="hover:text-white transition-colors duration-200">
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M9 8H7v3h2v9h3v-9h3l.5-3H12V6c0-.88.39-1 1-1h2V2h-3c-2.9 0-5 1.55-5 4.5V8z"/>
+                      </svg>
+                    </a>
+                    <a href={t.instagramLink || "#"} target="_blank" rel="noreferrer" className="hover:text-white transition-colors duration-200">
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
+                      </svg>
+                    </a>
+                    <a href={t.twitterLink || "#"} target="_blank" rel="noreferrer" className="hover:text-white transition-colors duration-200">
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
               </div>
             </motion.div>
           ))}

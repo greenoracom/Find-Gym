@@ -9,6 +9,9 @@ import giftBoxImg from '../assets/3d_gift_box.png';
 import { getActiveBanners } from '../userServices/homeApi';
 import { resolveMediaUrl } from '../userServices/config';
 import FeaturedGyms from './FeaturedGyms';
+const tofuBowlImg = "/balanced-bowl.png";
+const salmonImg = "/muscle-gain-bowl.png";
+const oatsBowlImg = "/breakfast-bowl.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,7 +29,7 @@ const Home = () => {
       calories: "420",
       protein: "32g",
       carbs: "45g",
-      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop",
+      image: tofuBowlImg,
       features: [
         "Personalized Meal Plans",
         "500+ Calorie-Counted Recipes",
@@ -40,7 +43,7 @@ const Home = () => {
       calories: "480",
       protein: "42g",
       carbs: "12g",
-      image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=1000&auto=format&fit=crop",
+      image: salmonImg,
       features: [
         "High Protein & Healthy Fats",
         "Low Carb / Keto Friendly",
@@ -49,12 +52,12 @@ const Home = () => {
       ]
     },
     {
-      name: "Avocado & Egg Toast",
+      name: "Berry Oats & Almond Bowl",
       description: "Start your morning with a perfect blend of high fiber, wholesome fats, and clean protein to keep you energized all day.",
       calories: "350",
       protein: "18g",
       carbs: "28g",
-      image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=1000&auto=format&fit=crop",
+      image: oatsBowlImg,
       features: [
         "Quick Breakfast Fuel",
         "Complex Carbs for Energy",
@@ -471,54 +474,91 @@ const Home = () => {
                 </div>
               </div>
             </div>
-
+            
             {/* Stats Bar */}
             <div
-              className={`bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-2xl p-6 md:p-8 flex flex-wrap justify-between items-center gap-6 stats-container shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-1000 transform ${whyVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+              className={`bg-[#0a0b0d]/75 border border-zinc-900 rounded-[2rem] p-6 md:p-8 stats-container shadow-2xl transition-all duration-1000 transform ${whyVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
               style={{ transitionDelay: '500ms' }}
             >
-              <div className="flex items-center gap-4 stat-item">
-                <div className="w-12 h-12 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-[#FF7A00]"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z" /></svg></div>
-                <div>
-                  <h4 className="text-2xl font-bold text-white">500+</h4>
-                  <p className="text-gray-400 text-xs">Gyms Listed</p>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
+                
+                {/* Stat 1: Gyms Listed */}
+                <div className="bg-[#111215]/80 border border-zinc-900 rounded-2xl py-8 px-4 flex flex-col items-center justify-center text-center group hover:border-[#FF7A00]/40 transition-all duration-300 relative shadow-lg">
+                  <div className="w-16 h-16 rounded-full bg-[#16171a] border border-[#FF7A00]/15 flex items-center justify-center text-[#FF7A00] mb-5 shadow-inner relative group-hover:scale-105 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-[#FF7A00]/5 rounded-full blur-[4px]"></div>
+                    <svg className="w-6 h-6 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-1">500+</h4>
+                  <p className="text-zinc-500 text-[10px] md:text-xs font-bold uppercase tracking-wider">Gyms Listed</p>
+                  <div className="w-6 h-0.5 bg-[#FF7A00] rounded-full mt-4 transition-all duration-300 group-hover:w-10"></div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4 stat-item">
-                <div className="w-12 h-12 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-[#FF7A00]"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M15 11V5l-3-3-3 3v2H3v14h18V11h-6zm-8 8H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5V9h2v2zm6 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2zm6 12h-2v-2h2v2zm0-4h-2v-2h2v2z" /></svg></div>
-                <div>
-                  <h4 className="text-2xl font-bold text-white">50+</h4>
-                  <p className="text-gray-400 text-xs">Cities Covered</p>
+
+                {/* Stat 2: Cities Covered */}
+                <div className="bg-[#111215]/80 border border-zinc-900 rounded-2xl py-8 px-4 flex flex-col items-center justify-center text-center group hover:border-[#FF7A00]/40 transition-all duration-300 relative shadow-lg">
+                  <div className="w-16 h-16 rounded-full bg-[#16171a] border border-[#FF7A00]/15 flex items-center justify-center text-[#FF7A00] mb-5 shadow-inner relative group-hover:scale-105 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-[#FF7A00]/5 rounded-full blur-[4px]"></div>
+                    <svg className="w-6 h-6 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M15 11V5l-3-3-3 3v2H3v14h18V11h-6zm-8 8H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5V9h2v2zm6 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2zm6 12h-2v-2h2v2zm0-4h-2v-2h2v2z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-1">50+</h4>
+                  <p className="text-zinc-500 text-[10px] md:text-xs font-bold uppercase tracking-wider">Cities Covered</p>
+                  <div className="w-6 h-0.5 bg-[#FF7A00] rounded-full mt-4 transition-all duration-300 group-hover:w-10"></div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4 stat-item">
-                <div className="w-12 h-12 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-[#FF7A00]"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" /></svg></div>
-                <div>
-                  <h4 className="text-2xl font-bold text-white">10K+</h4>
-                  <p className="text-gray-400 text-xs">Happy Users</p>
+
+                {/* Stat 3: Happy Users */}
+                <div className="bg-[#111215]/80 border border-zinc-900 rounded-2xl py-8 px-4 flex flex-col items-center justify-center text-center group hover:border-[#FF7A00]/40 transition-all duration-300 relative shadow-lg">
+                  <div className="w-16 h-16 rounded-full bg-[#16171a] border border-[#FF7A00]/15 flex items-center justify-center text-[#FF7A00] mb-5 shadow-inner relative group-hover:scale-105 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-[#FF7A00]/5 rounded-full blur-[4px]"></div>
+                    <svg className="w-6 h-6 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-1">10K+</h4>
+                  <p className="text-zinc-500 text-[10px] md:text-xs font-bold uppercase tracking-wider">Happy Users</p>
+                  <div className="w-6 h-0.5 bg-[#FF7A00] rounded-full mt-4 transition-all duration-300 group-hover:w-10"></div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4 stat-item">
-                <div className="w-12 h-12 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-[#FF7A00]"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg></div>
-                <div>
-                  <h4 className="text-2xl font-bold text-white">4.8</h4>
-                  <p className="text-gray-400 text-xs">Average Rating</p>
+
+                {/* Stat 4: Average Rating */}
+                <div className="bg-[#111215]/80 border border-zinc-900 rounded-2xl py-8 px-4 flex flex-col items-center justify-center text-center group hover:border-[#FF7A00]/40 transition-all duration-300 relative shadow-lg">
+                  <div className="w-16 h-16 rounded-full bg-[#16171a] border border-[#FF7A00]/15 flex items-center justify-center text-[#FF7A00] mb-5 shadow-inner relative group-hover:scale-105 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-[#FF7A00]/5 rounded-full blur-[4px]"></div>
+                    <svg className="w-6 h-6 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-1">4.8</h4>
+                  <p className="text-zinc-500 text-[10px] md:text-xs font-bold uppercase tracking-wider">Average Rating</p>
+                  <div className="w-6 h-0.5 bg-[#FF7A00] rounded-full mt-4 transition-all duration-300 group-hover:w-10"></div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4 stat-item">
-                <div className="w-12 h-12 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-[#FF7A00]"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" /></svg></div>
-                <div>
-                  <h4 className="text-2xl font-bold text-white">100%</h4>
-                  <p className="text-gray-400 text-xs">Trusted Platform</p>
+
+                {/* Stat 5: Trusted Platform */}
+                <div className="bg-[#111215]/80 border border-zinc-900 rounded-2xl py-8 px-4 flex flex-col items-center justify-center text-center group hover:border-[#FF7A00]/40 transition-all duration-300 relative shadow-lg">
+                  <div className="w-16 h-16 rounded-full bg-[#16171a] border border-[#FF7A00]/15 flex items-center justify-center text-[#FF7A00] mb-5 shadow-inner relative group-hover:scale-105 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-[#FF7A00]/5 rounded-full blur-[4px]"></div>
+                    <svg className="w-6 h-6 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-1">100%</h4>
+                  <p className="text-zinc-500 text-[10px] md:text-xs font-bold uppercase tracking-wider">Trusted Platform</p>
+                  <div className="w-6 h-0.5 bg-[#FF7A00] rounded-full mt-4 transition-all duration-300 group-hover:w-10"></div>
                 </div>
+
               </div>
             </div>
 
             {/* Footer Text */}
-            <div className="text-center mt-8 text-gray-400 text-sm flex items-center justify-center gap-2">
-              <svg className="w-4 h-4 text-[#FF7A00]" fill="currentColor" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z" /></svg>
-              Your Fitness. Your Choice. Our Platform.
-              <svg className="w-4 h-4 text-[#FF7A00]" fill="currentColor" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z" /></svg>
+            <div className="flex items-center justify-center gap-6 mt-10 w-full overflow-hidden">
+              <div className="hidden md:block flex-1 h-[1px] bg-gradient-to-r from-transparent to-[#FF7A00]/30"></div>
+              <div className="flex items-center gap-2 text-zinc-400 font-extrabold text-[11px] md:text-xs tracking-widest uppercase">
+                <span className="text-[#FF7A00] text-sm">⚡</span>
+                Your Fitness. Your Choice. Our Platform.
+                <span className="text-[#FF7A00] text-sm">⚡</span>
+              </div>
+              <div className="hidden md:block flex-1 h-[1px] bg-gradient-to-l from-transparent to-[#FF7A00]/30"></div>
             </div>
           </div>
         </div>
@@ -992,105 +1032,174 @@ const Home = () => {
           </div>
         </div>
 
-        {/* CTA Banner Section */}
+        {/* CTA Banner Section (Nutrition & Diet) */}
         <div className="pb-20 bg-[#000000] px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-7xl mx-auto">
-            <div className="relative bg-gradient-to-br from-[#0c0c0e] to-[#050506] rounded-3xl overflow-hidden border border-gray-800 flex flex-col lg:flex-row items-center justify-between p-8 md:p-12 shadow-[0_10px_40px_rgba(0,0,0,0.7)] gap-8">
+            <div className="relative bg-gradient-to-br from-[#0c0c0e] to-[#050506] rounded-[2.5rem] overflow-hidden border border-zinc-900/80 flex flex-col items-stretch p-8 md:p-12 shadow-[0_10px_40px_rgba(0,0,0,0.8)] gap-8">
 
               {/* Background ambient glow */}
               <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#FF7A00]/5 blur-3xl pointer-events-none" />
               <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-orange-600/5 blur-3xl pointer-events-none" />
 
-              {/* Content Left */}
-              <div className="relative z-20 lg:w-[58%] text-left">
-                {/* Pill Label */}
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF7A00]/10 border border-[#FF7A00]/25 text-[#FF7A00] text-[10px] font-bold uppercase tracking-wider mb-4">
-                  🥗 NUTRITION & DIET
-                </div>
+              {/* Top/Middle Section */}
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+                
+                {/* Content Left (60% width) */}
+                <div className="relative z-20 lg:w-[58%] text-left flex flex-col">
+                  {/* Pill Label */}
+                  <div className="flex">
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#FF7A00]/10 border border-[#FF7A00]/25 text-[#FF7A00] text-[10px] font-black uppercase tracking-wider mb-5">
+                      🥗 NUTRITION & DIET
+                    </span>
+                  </div>
 
-                <h2 className="text-3xl md:text-5xl font-black text-white mb-2 tracking-tight leading-tight">
-                  Ready for <span className="text-[#FF7A00] drop-shadow-[0_0_10px_rgba(255,122,0,0.3)]">Healthy Food</span>?
-                </h2>
+                  <h2 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight leading-none">
+                    Ready for <span className="text-[#FF7A00] drop-shadow-[0_0_10px_rgba(255,122,0,0.3)]">Healthy Food</span>?
+                  </h2>
 
-                {/* Dynamic Dish Name Sub-heading */}
-                <h3 className="text-xl md:text-2xl font-bold text-white mb-3 flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF7A00]"></span>
-                  {healthyDishes[activeDishIndex].name}
-                </h3>
+                  <p className="text-zinc-400 text-xs md:text-sm mb-8 leading-relaxed max-w-xl">
+                    Discover customized nutrition guides, calorie-matched meal prep recipes, and expert-backed dietary advice to fuel your body perfectly.
+                  </p>
 
-                <p className="text-gray-400 text-sm md:text-base mb-6 leading-relaxed min-h-[60px]">
-                  {healthyDishes[activeDishIndex].description}
-                </p>
-
-                {/* Features Grid (Dynamic) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 min-h-[80px]">
-                  {healthyDishes[activeDishIndex].features.map((feature, idx) => (
-                    <div key={idx} className="flex items-center gap-2.5 text-gray-300 text-sm font-semibold">
-                      <span className="w-5 h-5 rounded-full bg-[#FF7A00]/15 flex items-center justify-center text-[#FF7A00] text-xs">✓</span>
-                      <span>{feature}</span>
+                  {/* 4 Feature Cards Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    {/* Card 1 */}
+                    <div className="bg-[#0e1013]/60 border border-zinc-900/60 rounded-2xl p-4 flex gap-4 items-center">
+                      <div className="w-10 h-10 rounded-full bg-[#FF7A00]/10 border border-[#FF7A00]/20 flex items-center justify-center text-[#FF7A00] flex-shrink-0 text-lg">
+                        📋
+                      </div>
+                      <div className="flex flex-col text-left">
+                        <span className="text-white font-bold text-xs md:text-sm">Personalized Meal Plans</span>
+                        <span className="text-zinc-500 text-[10px] md:text-xs leading-tight mt-0.5">Plans tailored to your goals & lifestyle.</span>
+                      </div>
                     </div>
-                  ))}
+
+                    {/* Card 2 */}
+                    <div className="bg-[#0e1013]/60 border border-zinc-900/60 rounded-2xl p-4 flex gap-4 items-center">
+                      <div className="w-10 h-10 rounded-full bg-[#FF7A00]/10 border border-[#FF7A00]/20 flex items-center justify-center text-[#FF7A00] flex-shrink-0 text-lg">
+                        🍳
+                      </div>
+                      <div className="flex flex-col text-left">
+                        <span className="text-white font-bold text-xs md:text-sm">500+ Calorie-Counted Recipes</span>
+                        <span className="text-zinc-500 text-[10px] md:text-xs leading-tight mt-0.5">Delicious recipes with precise macros.</span>
+                      </div>
+                    </div>
+
+                    {/* Card 3 */}
+                    <div className="bg-[#0e1013]/60 border border-zinc-900/60 rounded-2xl p-4 flex gap-4 items-center">
+                      <div className="w-10 h-10 rounded-full bg-[#FF7A00]/10 border border-[#FF7A00]/20 flex items-center justify-center text-[#FF7A00] flex-shrink-0 text-lg">
+                        🔥
+                      </div>
+                      <div className="flex flex-col text-left">
+                        <span className="text-white font-bold text-xs md:text-sm">Calorie & Macro Tracker</span>
+                        <span className="text-zinc-500 text-[10px] md:text-xs leading-tight mt-0.5">Track nutrients easily to stay on target.</span>
+                      </div>
+                    </div>
+
+                    {/* Card 4 */}
+                    <div className="bg-[#0e1013]/60 border border-zinc-900/60 rounded-2xl p-4 flex gap-4 items-center">
+                      <div className="w-10 h-10 rounded-full bg-[#FF7A00]/10 border border-[#FF7A00]/20 flex items-center justify-center text-[#FF7A00] flex-shrink-0 text-lg">
+                        👤
+                      </div>
+                      <div className="flex flex-col text-left">
+                        <span className="text-white font-bold text-xs md:text-sm">Expert Dietitian Consultations</span>
+                        <span className="text-zinc-500 text-[10px] md:text-xs leading-tight mt-0.5">Get support from certified nutrition experts.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button className="bg-gradient-to-r from-[#FF7A00] to-[#E66E00] hover:to-[#FF7A00] text-white font-black py-4 px-8 rounded-2xl flex items-center gap-2 transition-all duration-300 shadow-[0_6px_20px_rgba(255,122,0,0.35)] cursor-pointer text-xs w-fit uppercase tracking-wider">
+                    Explore Healthy Food <span>➔</span>
+                  </button>
                 </div>
 
-                <button className="bg-[#FF7A00] hover:bg-[#E66E00] text-white font-bold py-3.5 px-8 rounded-xl flex items-center gap-2 transition-all duration-300 shadow-[0_4px_15px_rgba(255,122,0,0.3)] hover:shadow-[0_4px_25px_rgba(255,122,0,0.5)] hover:-translate-y-0.5 cursor-pointer text-sm w-fit">
-                  Explore Healthy Food
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </button>
-              </div>
+                {/* Graphic Right (40% width) - Interactive orbiting plate */}
+                <div className="relative z-20 lg:w-[40%] w-full flex flex-col justify-center items-center min-h-[380px]">
+                  {/* Orbiting Golden Ring Effect */}
+                  <div className="absolute w-[320px] h-[320px] md:w-[410px] md:h-[410px] rounded-full border border-dashed border-[#FF7A00]/20 animate-[spin_40s_linear_infinite] pointer-events-none"></div>
+                  
+                  {/* Glowing Plate Backdrop */}
+                  <div className="absolute w-72 h-72 md:w-80 md:h-80 rounded-full bg-gradient-to-tr from-[#FF7A00]/20 to-orange-500/5 blur-2xl pointer-events-none"></div>
 
-              {/* Graphic Right (With Navigation Arrows at the Bottom) */}
-              <div className="relative z-20 lg:w-[40%] w-full flex flex-col justify-center items-center min-h-[300px]">
-                {/* Glowing Circle Backdrop */}
-                <div className="absolute w-56 h-56 rounded-full bg-gradient-to-tr from-[#FF7A00]/20 to-orange-500/10 blur-xl"></div>
+                  {/* Main Plate Image */}
+                  <motion.img
+                    key={activeDishIndex}
+                    initial={{ opacity: 0, rotate: -45, scale: 0.85 }}
+                    animate={{ opacity: 1, rotate: 6, scale: 1 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    src={healthyDishes[activeDishIndex].image}
+                    alt={healthyDishes[activeDishIndex].name}
+                    className="w-60 h-60 md:w-80 md:h-80 lg:w-[360px] lg:h-[360px] object-cover rounded-full border border-[#FF7A00]/30 shadow-[0_15px_35px_rgba(255,122,0,0.3)] relative z-10 transition-transform duration-500 hover:scale-105"
+                  />
 
-                {/* Main Plate Image (With Framer Motion for change animation) */}
-                <motion.img
-                  key={activeDishIndex}
-                  initial={{ opacity: 0, rotate: -45, scale: 0.8 }}
-                  animate={{ opacity: 1, rotate: 6, scale: 1 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  src={healthyDishes[activeDishIndex].image}
-                  alt={healthyDishes[activeDishIndex].name}
-                  className="w-52 h-52 md:w-60 md:h-60 object-cover rounded-full border border-[#FF7A00]/30 shadow-[0_10px_30px_rgba(255,122,0,0.3)] transform hover:rotate-12 transition-transform duration-500 relative z-10"
-                />
+                  {/* Floating Glassmorphic Macro Badges */}
+                  <div key={`macros-${activeDishIndex}`} className="absolute inset-0 pointer-events-none">
+                    {/* Badge 1: Calories (Top) */}
+                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#090a0c]/85 border border-zinc-900 px-4 py-2 rounded-xl shadow-lg z-20 flex items-center gap-2">
+                      <span className="text-[#FF7A00] text-sm">🔥</span>
+                      <div className="flex flex-col items-start leading-none">
+                        <span className="text-white font-black text-xs">{healthyDishes[activeDishIndex].calories} kcal</span>
+                        <span className="text-zinc-500 text-[8px] mt-0.5">Calories</span>
+                      </div>
+                    </div>
 
-                {/* Floating Glassmorphic Macro Badges */}
-                <div key={`macros-${activeDishIndex}`}>
-                  <div className="absolute top-0 left-8 bg-black/75 backdrop-blur-md border border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.5)] px-3 py-1.5 rounded-xl text-xs text-white font-bold z-20 flex items-center gap-1.5 animate-bounce" style={{ animationDuration: '3s' }}>
-                    🔥 <span className="text-[#FF7A00]">{healthyDishes[activeDishIndex].calories}</span> kcal
-                  </div>
+                    {/* Badge 2: Protein (Bottom-Left) */}
+                    <div className="absolute bottom-4 left-[-20px] lg:left-[-35px] bg-[#090a0c]/85 border border-zinc-900 px-4 py-2.5 rounded-xl shadow-lg z-20 flex items-center gap-2">
+                      <span className="text-[#FF7A00] text-sm">💪</span>
+                      <div className="flex flex-col items-start leading-none">
+                        <span className="text-white font-black text-xs">{healthyDishes[activeDishIndex].protein}</span>
+                        <span className="text-zinc-500 text-[8px] mt-0.5">Protein</span>
+                      </div>
+                    </div>
 
-                  <div className="absolute bottom-12 left-4 bg-black/75 backdrop-blur-md border border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.5)] px-3 py-1.5 rounded-xl text-xs text-white font-bold z-20 flex items-center gap-1.5 animate-bounce" style={{ animationDuration: '3.5s' }}>
-                    💪 <span className="text-[#FF7A00]">{healthyDishes[activeDishIndex].protein}</span> Protein
-                  </div>
-
-                  <div className="absolute top-12 right-6 bg-black/75 backdrop-blur-md border border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.5)] px-3 py-1.5 rounded-xl text-xs text-white font-bold z-20 flex items-center gap-1.5 animate-bounce" style={{ animationDuration: '4s' }}>
-                    🌾 <span className="text-[#FF7A00]">{healthyDishes[activeDishIndex].carbs}</span> Carbs
+                    {/* Badge 3: Carbs (Right-Middle) */}
+                    <div className="absolute top-1/3 right-[-20px] lg:right-[-35px] bg-[#090a0c]/85 border border-zinc-900 px-4 py-2.5 rounded-xl shadow-lg z-20 flex items-center gap-2">
+                      <span className="text-[#FF7A00] text-sm">🌾</span>
+                      <div className="flex flex-col items-start leading-none">
+                        <span className="text-white font-black text-xs">{healthyDishes[activeDishIndex].carbs}</span>
+                        <span className="text-zinc-500 text-[8px] mt-0.5">Carbs</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
+
               </div>
 
-              {/* Navigation Arrows Group in the Bottom-Right Corner of the Box */}
-              <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-30 flex gap-2.5">
-                <button
-                  onClick={() => setActiveDishIndex((prev) => (prev === 0 ? healthyDishes.length - 1 : prev - 1))}
-                  className="w-9 h-9 rounded-full bg-black/60 hover:bg-[#FF7A00] border border-white/10 hover:border-[#FF7A00] text-white hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-lg hover:scale-105 active:scale-95"
-                  title="Previous Dish"
-                >
-                  <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
+              {/* Bottom Row: Arrow Navigation */}
+              <div className="relative z-20 mt-8 border-t border-zinc-900/60 pt-6 flex items-center justify-end">
+                
+                {/* Arrows and Pagination Dots */}
+                <div className="flex items-center gap-5">
+                  {/* Pagination Dots */}
+                  <div className="flex gap-2">
+                    {healthyDishes.map((_, i) => (
+                      <span
+                        key={i}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${activeDishIndex === i ? 'bg-[#FF7A00] w-4' : 'bg-zinc-800 w-1.5'}`}
+                      ></span>
+                    ))}
+                  </div>
 
-                <button
-                  onClick={() => setActiveDishIndex((prev) => (prev === healthyDishes.length - 1 ? 0 : prev + 1))}
-                  className="w-9 h-9 rounded-full bg-black/60 hover:bg-[#FF7A00] border border-white/10 hover:border-[#FF7A00] text-white hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-lg hover:scale-105 active:scale-95"
-                  title="Next Dish"
-                >
-                  <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
+                  {/* Navigation Arrows */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setActiveDishIndex((prev) => (prev === 0 ? healthyDishes.length - 1 : prev - 1))}
+                      className="w-9 h-9 rounded-full bg-zinc-900 hover:bg-[#FF7A00] border border-zinc-850 hover:border-[#FF7A00] text-white hover:text-black transition-all flex items-center justify-center cursor-pointer shadow-lg active:scale-95"
+                      title="Previous Dish"
+                    >
+                      <span className="rotate-180 inline-block">➔</span>
+                    </button>
+
+                    <button
+                      onClick={() => setActiveDishIndex((prev) => (prev === healthyDishes.length - 1 ? 0 : prev + 1))}
+                      className="w-9 h-9 rounded-full bg-[#FF7A00] text-black transition-all flex items-center justify-center cursor-pointer shadow-lg hover:scale-105 active:scale-95"
+                      title="Next Dish"
+                    >
+                      <span>➔</span>
+                    </button>
+                  </div>
+                </div>
+
               </div>
 
             </div>
@@ -1213,53 +1322,6 @@ const Home = () => {
                   <div>
                     <h3 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3">Top Facilities</h3>
                     <p className="text-gray-400 text-xs md:text-sm leading-relaxed">Access modern equipment and world-class fitness facilities.</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 5: Full Width - Your Health First & Stats */}
-              <div className="relative bg-[#000000] border border-gray-800 rounded-2xl overflow-hidden h-auto lg:col-span-2 group flex flex-col md:flex-row items-center p-6 md:p-8 hover:border-[#FF7A00]/50 transition-all duration-300 gap-8">
-                <div className="absolute inset-0 z-0 hidden md:block">
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#000000] via-[#000000]/90 to-[#000000]/20 z-10"></div>
-                  <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1470&auto=format&fit=crop" className="w-full h-full object-cover object-right opacity-30 group-hover:opacity-50 transition-opacity duration-500" alt="Your Health First" />
-                </div>
-
-                <div className="relative z-20 flex gap-5 md:gap-6 items-center md:w-[40%]">
-                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#FF7A00]/10 border border-[#FF7A00]/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(255,122,0,0.15)]">
-                    <svg className="w-6 h-6 md:w-8 md:h-8 text-[#FF7A00] drop-shadow-[0_0_10px_rgba(255,122,0,0.8)]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z" /><path d="M11 15H13V11H16L12 7L8 11H11V15Z" fill="#000000" /></svg>
-                  </div>
-                  <div>
-                    <h3 className="text-xl md:text-2xl font-bold text-white mb-1 md:mb-2">Your Health First</h3>
-                    <p className="text-gray-400 text-xs md:text-sm leading-relaxed max-w-xs">We are dedicated to helping you live a healthy and better life.</p>
-                  </div>
-                </div>
-
-                {/* Stats within the card */}
-                <div className="relative z-20 flex flex-wrap md:flex-nowrap items-center justify-center md:justify-end gap-6 md:gap-10 md:w-[60%] w-full">
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-[#FF7A00]/30 bg-[#161B26] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(255,122,0,0.15)]"><svg className="w-4 h-4 md:w-5 md:h-5 text-[#FF7A00]" fill="currentColor" viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z" /></svg></div>
-                    <h4 className="text-lg md:text-xl font-bold text-white">500+</h4>
-                    <p className="text-gray-400 text-[9px] md:text-[10px] text-center mt-1">Gyms Listed</p>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-[#FF7A00]/30 bg-[#161B26] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(255,122,0,0.15)]"><svg className="w-4 h-4 md:w-5 md:h-5 text-[#FF7A00]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg></div>
-                    <h4 className="text-lg md:text-xl font-bold text-white">50+</h4>
-                    <p className="text-gray-400 text-[9px] md:text-[10px] text-center mt-1">Cities Covered</p>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-[#FF7A00]/30 bg-[#161B26] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(255,122,0,0.15)]"><svg className="w-4 h-4 md:w-5 md:h-5 text-[#FF7A00]" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" /></svg></div>
-                    <h4 className="text-lg md:text-xl font-bold text-white">10K+</h4>
-                    <p className="text-gray-400 text-[9px] md:text-[10px] text-center mt-1">Happy Users</p>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-[#FF7A00]/30 bg-[#161B26] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(255,122,0,0.15)]"><svg className="w-4 h-4 md:w-5 md:h-5 text-[#FF7A00]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg></div>
-                    <h4 className="text-lg md:text-xl font-bold text-white">4.8</h4>
-                    <p className="text-gray-400 text-[9px] md:text-[10px] text-center mt-1">Average Rating</p>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-[#FF7A00]/30 bg-[#161B26] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(255,122,0,0.15)]"><svg className="w-4 h-4 md:w-5 md:h-5 text-[#FF7A00]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" /></svg></div>
-                    <h4 className="text-lg md:text-xl font-bold text-white">100%</h4>
-                    <p className="text-gray-400 text-[9px] md:text-[10px] text-center mt-1">Verified Listings</p>
                   </div>
                 </div>
               </div>

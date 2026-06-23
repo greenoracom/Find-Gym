@@ -9,15 +9,30 @@ exports.getBanners = async (req, res) => {
   }
 };
 
+const fs = require('fs');
+const { uploadToCloudinary } = require('../utils/cloudinary');
+
 exports.uploadBanner = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ status: 'error', message: 'No file uploaded' });
     }
     
+    // Read local uploaded file buffer
+    const fileBuffer = fs.readFileSync(req.file.path);
+    // Upload to Cloudinary under 'banners' folder
+    const cloudinaryUrl = await uploadToCloudinary(fileBuffer, 'banners');
+
+    // Clean up local temp file
+    try {
+      fs.unlinkSync(req.file.path);
+    } catch (err) {
+      console.error('Failed to delete temp file:', err.message);
+    }
+
     const banner = new Banner({
       title: req.body.title || req.file.originalname,
-      mediaUrl: `/cms/banners/${req.file.filename}`,
+      mediaUrl: cloudinaryUrl,
       mediaType: req.file.mimetype,
     });
     

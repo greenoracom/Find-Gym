@@ -67,7 +67,7 @@ const GymSetup = () => {
 
   // Temp input states for array fields
   const [newGalleryUrl, setNewGalleryUrl] = useState('');
-  const [newTrainer, setNewTrainer] = useState({ name: '', photo: '', experience: '', specialization: '' });
+  const [newTrainer, setNewTrainer] = useState({ name: '', photo: '', experience: '', specialization: '', bio: '', skills: '', instagramLink: '', certification: '', availability: '', trainingType: 'Weight Loss' });
   const [newPlan, setNewPlan] = useState({ title: '', price: '', duration: '', validity: '', saving: '', isPopular: false });
   const [newOffer, setNewOffer] = useState({ title: '', description: '', image: '', expiryDate: '', offerType: '' });
 
@@ -290,8 +290,12 @@ const GymSetup = () => {
       toast.error('Trainer Name, Experience and Specialization are required');
       return;
     }
-    setTrainers(prev => [...prev, { ...newTrainer }]);
-    setNewTrainer({ name: '', photo: '', experience: '', specialization: '' });
+    const skillsArray = typeof newTrainer.skills === 'string'
+      ? newTrainer.skills.split(',').map(s => s.trim()).filter(Boolean)
+      : (Array.isArray(newTrainer.skills) ? newTrainer.skills : []);
+
+    setTrainers(prev => [...prev, { ...newTrainer, skills: skillsArray }]);
+    setNewTrainer({ name: '', photo: '', experience: '', specialization: '', bio: '', skills: '', instagramLink: '', certification: '', availability: '', trainingType: 'Weight Loss' });
   };
 
   const removeTrainer = (index) => {
@@ -759,6 +763,70 @@ const GymSetup = () => {
                         placeholder="e.g. Strength & Conditioning"
                         className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 text-xs text-slate-800"
                       />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Trainer Bio / Short Description</label>
+                      <textarea
+                        value={newTrainer.bio}
+                        onChange={(e) => setNewTrainer(prev => ({ ...prev, bio: e.target.value }))}
+                        placeholder="Tell members about this trainer..."
+                        rows={2}
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 text-xs text-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Skills / Tags (comma separated)</label>
+                      <input
+                        type="text"
+                        value={newTrainer.skills}
+                        onChange={(e) => setNewTrainer(prev => ({ ...prev, skills: e.target.value }))}
+                        placeholder="e.g. Strength, Weight Loss, Diet, Cardio"
+                        className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 text-xs text-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Instagram / Profile Link</label>
+                      <input
+                        type="text"
+                        value={newTrainer.instagramLink}
+                        onChange={(e) => setNewTrainer(prev => ({ ...prev, instagramLink: e.target.value }))}
+                        placeholder="e.g. https://instagram.com/trainer"
+                        className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 text-xs text-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Certification Name</label>
+                      <input
+                        type="text"
+                        value={newTrainer.certification}
+                        onChange={(e) => setNewTrainer(prev => ({ ...prev, certification: e.target.value }))}
+                        placeholder="e.g. Gold's Gym Certified, ACSM"
+                        className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 text-xs text-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Availability / Timing</label>
+                      <input
+                        type="text"
+                        value={newTrainer.availability}
+                        onChange={(e) => setNewTrainer(prev => ({ ...prev, availability: e.target.value }))}
+                        placeholder="e.g. 6:00 AM - 12:00 PM, 4:00 PM - 8:00 PM"
+                        className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 text-xs text-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Training Type</label>
+                      <select
+                        value={newTrainer.trainingType}
+                        onChange={(e) => setNewTrainer(prev => ({ ...prev, trainingType: e.target.value }))}
+                        className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 text-xs text-slate-800"
+                      >
+                        <option value="Weight Loss">Weight Loss</option>
+                        <option value="Bodybuilding">Bodybuilding</option>
+                        <option value="CrossFit">CrossFit</option>
+                        <option value="Yoga">Yoga</option>
+                        <option value="Functional Training">Functional Training</option>
+                      </select>
                     </div>
                   </div>
                   <button

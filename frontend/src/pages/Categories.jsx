@@ -1428,7 +1428,12 @@ const Categories = () => {
                                   brand: item.brand,
                                   price: item.sellingPrice || item.oneTimePrice || 0,
                                   image: item.images?.[0] || '',
-                                  qty: 1
+                                  qty: 1,
+                                  healthStore: item.healthStore?._id || item.healthStore,
+                                  productType: item.productType,
+                                  flavor: item.productType === 'Supplement' ? (item.variants?.[0]?.flavor || item.flavor || '') : undefined,
+                                  size: item.productType === 'Supplement' ? (item.variants?.[0]?.size || item.quantity || '') : undefined,
+                                  purchaseType: item.productType === 'Diet' ? 'One Time' : undefined
                                 });
                               }
                               localStorage.setItem("cart_items", JSON.stringify(existing));
@@ -2006,7 +2011,12 @@ const Categories = () => {
                         brand: selectedProduct.brand,
                         price: selectedProduct.sellingPrice || selectedProduct.oneTimePrice || 0,
                         image: selectedProduct.images?.[0] || '',
-                        qty: cartQty
+                        qty: cartQty,
+                        healthStore: selectedProduct.healthStore?._id || selectedProduct.healthStore,
+                        productType: selectedProduct.productType,
+                        flavor: selectedProduct.productType === 'Supplement' ? selectedFlavor : undefined,
+                        size: selectedProduct.productType === 'Supplement' ? selectedSize : undefined,
+                        purchaseType: selectedProduct.productType === 'Diet' ? (purchaseType || 'One Time') : undefined
                       });
                     }
                     localStorage.setItem("cart_items", JSON.stringify(existing));
