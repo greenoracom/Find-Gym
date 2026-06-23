@@ -86,6 +86,6 @@ jobs:
             cd "${{ secrets.DEPLOY_PATH }}"
             git pull --ff-only origin main
             printf '%s\n' "$ENV_PRODUCTION" > .env.production
-            docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build --remove-orphans
+            docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build --no-cache --remove-orphans
             docker compose --env-file .env.production -f docker-compose.prod.yml ps
             docker image prune -f
