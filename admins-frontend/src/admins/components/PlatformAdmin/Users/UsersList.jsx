@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { getAllUsers } from '../../../../services/adminApi';
 import UserDetails from './UserDetails';
 import BlockUserModal from './BlockUserModal';
-import { Users, Monitor, Smartphone, Search, RotateCw, Mail, Phone, Calendar } from 'lucide-react';
+import { Users, Monitor, Smartphone, Search, RotateCw, Mail, Phone, Calendar, Award } from 'lucide-react';
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
@@ -11,11 +11,20 @@ const UsersList = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [userType, setUserType] = useState('all');
-  const [stats, setStats] = useState({ total: 0, website: 0, mobile: 0 });
+  const [stats, setStats] = useState({ total: 0, website: 0, mobile: 0, members: 0 });
   
   const [selectedUser, setSelectedUser] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [blockModalInfo, setBlockModalInfo] = useState({ isOpen: false, user: null, action: 'block' });
+
+  const tabs = [
+    { id: 'all', label: 'All Users', icon: Users },
+    { id: 'website', label: 'Website Users', icon: Monitor },
+    { id: 'mobile', label: 'Mobile App Users', icon: Smartphone },
+    { id: 'members', label: 'Active Members', icon: Award }
+  ];
+  const rawIndex = tabs.findIndex(t => t.id === userType);
+  const activeIndex = rawIndex === -1 ? 0 : rawIndex;
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -156,6 +165,26 @@ const UsersList = () => {
               <p className="text-xl font-bold text-slate-800 mt-0.5">{stats.mobile}</p>
             </div>
           </div>
+
+          <div 
+            onClick={() => {
+              setUserType('members');
+              setPagination(prev => ({ ...prev, currentPage: 1 }));
+            }}
+            className={`px-5 py-4 rounded-xl shadow-sm border flex items-center gap-4 min-w-[170px] flex-1 sm:flex-none cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+              userType === 'members'
+                ? 'bg-orange-50/20 border-orange-200 ring-2 ring-orange-500/20'
+                : 'bg-white border-slate-100'
+            }`}
+          >
+            <div className="p-3 bg-orange-50 text-orange-600 rounded-lg">
+              <Award className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Members</p>
+              <p className="text-xl font-bold text-slate-800 mt-0.5">{stats.members || 0}</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -163,66 +192,40 @@ const UsersList = () => {
         {/* Tabs and Filters Row */}
         <div className="p-6 border-b border-slate-200 flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white">
           {/* Tabs */}
-          <div className="flex items-center gap-2 border border-slate-100 p-1 bg-slate-50/55 rounded-xl">
-            <button
-              onClick={() => {
-                setUserType('all');
-                setPagination(prev => ({ ...prev, currentPage: 1 }));
+          {/* Tabs with sliding backdrop pill */}
+          <div className="flex items-center gap-1 border border-slate-100 p-1 bg-slate-50/55 rounded-xl relative select-none w-fit">
+            {/* Sliding backdrop pill */}
+            <div
+              className="absolute top-1 bottom-1 left-1 rounded-lg bg-indigo-600 shadow-sm transition-all duration-300 ease-out pointer-events-none"
+              style={{
+                width: '150px',
+                transform: `translateX(${activeIndex * (150 + 4)}px)`
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                userType === 'all'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
-              }`}
-            >
-              <Users className="w-4 h-4" />
-              All Users
-            </button>
-            <button
-              onClick={() => {
-                setUserType('website');
-                setPagination(prev => ({ ...prev, currentPage: 1 }));
-              }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                userType === 'website'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
-              }`}
-            >
-              <Monitor className="w-4 h-4" />
-              Website Users
-            </button>
-            <button
-              onClick={() => {
-                setUserType('mobile');
-                setPagination(prev => ({ ...prev, currentPage: 1 }));
-              }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                userType === 'mobile'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
-              }`}
-            >
-              <Smartphone className="w-4 h-4" />
-              Mobile App Users
-            </button>
+            />
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = userType === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setUserType(tab.id);
+                    setPagination(prev => ({ ...prev, currentPage: 1 }));
+                  }}
+                  className={`z-10 flex items-center justify-center gap-2 w-[150px] py-2 rounded-lg text-sm font-semibold transition-all duration-300 cursor-pointer ${
+                    isActive ? 'text-white' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* Search, Status, Refresh */}
           <div className="flex flex-wrap items-center gap-3">
-            <div className="relative flex-1 min-w-[200px] sm:w-64">
-              <Search className="absolute inset-y-0 left-3 my-auto text-slate-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search users..."
-                className="pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-sm placeholder-slate-400 bg-slate-50/20"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPagination(prev => ({ ...prev, currentPage: 1 })); 
-                }}
-              />
-            </div>
+
             
             <select 
               className="px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm font-semibold text-slate-600 cursor-pointer"

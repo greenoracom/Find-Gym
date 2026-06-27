@@ -1,6 +1,7 @@
 const WebsiteUser = require('../../models/WebsiteUser');
 const MobileUser = require('../../models/MobileUser');
 const ActivityLog = require('../../models/ActivityLog');
+const Membership = require('../../models/Membership');
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -9,7 +10,7 @@ exports.getAllUsers = async (req, res) => {
     const skip = (page - 1) * limit;
     const userType = req.query.userType || 'all';
 
-    let query = { role: 'user' };
+    let query = { role: { $in: ['user', 'member'] } };
     
     if (req.query.search) {
       const searchRegex = new RegExp(req.query.search, 'i');
@@ -31,9 +32,13 @@ exports.getAllUsers = async (req, res) => {
     }
 
     // Get total counts for the stats cards regardless of search/status filters
-    const statWebsiteCount = await WebsiteUser.countDocuments({ role: 'user' });
-    const statMobileCount = await MobileUser.countDocuments({ role: 'user' });
+    const statWebsiteCount = await WebsiteUser.countDocuments({ role: { $in: ['user', 'member'] } });
+    const statMobileCount = await MobileUser.countDocuments({ role: { $in: ['user', 'member'] } });
     const statTotalCount = statWebsiteCount + statMobileCount;
+    const activeMemberCustomerIds = await Membership.distinct('customerId', { status: 'active' });
+    const existingWebMembers = await WebsiteUser.countDocuments({ _id: { $in: activeMemberCustomerIds }, role: { $in: ['user', 'member'] } });
+    const existingMobMembers = await MobileUser.countDocuments({ _id: { $in: activeMemberCustomerIds }, role: { $in: ['user', 'member'] } });
+    const statMemberCount = existingWebMembers + existingMobMembers;
 
     let users = [];
     let totalCount = 0;
@@ -69,6 +74,26 @@ exports.getAllUsers = async (req, res) => {
         .limit(limit)
         .select('-password');
       users = dbUsers.map(u => formatUser(u, 'mobile'));
+    } else if (userType === 'members') {
+      const activeMemberCustomerIds = await Membership.distinct('customerId', { status: 'active' });
+      const memberQuery = { ...query, _id: { $in: activeMemberCustomerIds } };
+      
+      const websiteUsers = await WebsiteUser.find(memberQuery).select('-password');
+      const mobileUsers = await MobileUser.find(memberQuery).select('-password');
+
+      const allMembersCombined = [
+        ...websiteUsers.map(u => formatUser(u, 'website')),
+        ...mobileUsers.map(u => formatUser(u, 'mobile'))
+      ];
+
+      allMembersCombined.sort((a, b) => {
+        const valA = a[sortField] ? new Date(a[sortField]).getTime() : 0;
+        const valB = b[sortField] ? new Date(b[sortField]).getTime() : 0;
+        return sortOrder === 1 ? valA - valB : valB - valA;
+      });
+
+      totalCount = allMembersCombined.length;
+      users = allMembersCombined.slice(skip, skip + limit);
     } else {
       // Combined 'all' users
       const websiteUsers = await WebsiteUser.find(query).select('-password');
@@ -103,7 +128,8 @@ exports.getAllUsers = async (req, res) => {
         stats: {
           total: statTotalCount,
           website: statWebsiteCount,
-          mobile: statMobileCount
+          mobile: statMobileCount,
+          members: statMemberCount
         }
       }
     });
